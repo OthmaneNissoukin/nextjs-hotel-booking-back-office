@@ -26,8 +26,6 @@ function Layout() {
             <Outlet />
           </div>
         </main>
-
-        <Banner />
       </div>
     </div>
   );

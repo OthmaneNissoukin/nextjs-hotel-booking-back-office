@@ -6,7 +6,7 @@ import "./css/style.css";
 import "./charts/ChartjsConfig";
 
 // Import pages
-import Guests from "./pages/Guests";
+import Rooms from "./pages/Rooms";
 import Layout from "./ui/Layout";
 
 function App() {
@@ -22,8 +22,8 @@ function App() {
     <>
       <Routes>
         <Route element={<Layout />}>
-          <Route exact path="/" element={<Guests />} />
-          <Route exact path="/guests" element={<Guests />} />
+          <Route exact path="/" element={<Rooms />} />
+          <Route exact path="/rooms" element={<Rooms />} />
         </Route>
         {/* <Route exact path="/" element={<Dashboard />} /> */}
       </Routes>
