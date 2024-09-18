@@ -109,7 +109,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
               >
                 <NavLink
                   end
-                  to="https://cruip.com/mosaic/"
+                  to="/rooms"
                   className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
                     pathname.includes("rooms") ? "" : "hover:text-gray-900 dark:hover:text-white"
                   }`}
@@ -171,21 +171,21 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
               {/* GUESTS */}
               <li
                 className={`pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-[linear-gradient(135deg,var(--tw-gradient-stops))] ${
-                  pathname.includes("calendar") &&
+                  pathname.includes("guests") &&
                   "from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]"
                 }`}
               >
                 <NavLink
                   end
-                  to="/rooms"
+                  to="/guests"
                   className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                    pathname.includes("calendar") ? "" : "hover:text-gray-900 dark:hover:text-white"
+                    pathname.includes("guests") ? "" : "hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
                   <div className="flex items-center">
                     <svg
                       className={`shrink-0 fill-current ${
-                        pathname.includes("calendar") ? "text-violet-500" : "text-gray-400 dark:text-gray-500"
+                        pathname.includes("guests") ? "text-violet-500" : "text-gray-400 dark:text-gray-500"
                       }`}
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"

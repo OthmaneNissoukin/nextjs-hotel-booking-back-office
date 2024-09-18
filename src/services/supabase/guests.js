@@ -7,6 +7,15 @@ export async function getGuestById(id) {
 
   return guests;
 }
+export async function getAllGuests() {
+  let { data: guests, error } = await supabase.from("guests").select("*");
+
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  if (error) console.log(error);
+
+  return guests;
+}
 
 export async function getGuestByEmail(email) {
   let { data: guests, error } = await supabase.from("guests").select("*").eq("email", email).single();

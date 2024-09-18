@@ -2,10 +2,6 @@ import React, { useState } from "react";
 
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
-import FilterButton from "../components/DropdownFilter";
-import Datepicker from "../components/Datepicker";
-
-import Banner from "../partials/Banner";
 import { Outlet } from "react-router-dom";
 
 function Layout() {
