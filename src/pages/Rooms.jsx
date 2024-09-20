@@ -9,7 +9,13 @@ import SectionContainer from "../ui/SectionContainer";
 function Rooms() {
   // const queryClient = useQueryClient();
   const [filter, setFilter] = useState("");
-  const { data: rooms = [], isLoading } = useQuery({ queryKey: ["rooms"], queryFn: getAllRooms });
+  const { data: rooms = [], isLoading, isError, error } = useQuery({ queryKey: ["rooms"], queryFn: getAllRooms });
+
+  if (isLoading || error) return <h1>Loading...</h1>;
+
+  if (isError) return <h1>Error, Please check your network and try again</h1>;
+
+  if (!rooms) return <h1>No room was found</h1>;
 
   let filteredRooms = [...rooms];
 
@@ -29,8 +35,6 @@ function Rooms() {
     default:
       filteredRooms = rooms;
   }
-
-  if (isLoading) return <h1>Loading...</h1>;
 
   return (
     <SectionContainer label={"Rooms"} description={"List of all the available rooms"}>
