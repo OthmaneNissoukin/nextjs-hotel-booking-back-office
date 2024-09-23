@@ -6,15 +6,18 @@ function Head({ headings = [] }) {
   return (
     <thead>
       <tr className="dark:bg-slate-800 bg-slate-200">
-        {headings.map((title, index) => (
-          <th
-            key={index}
-            scope="col"
-            className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-stone-300"
-          >
-            {title}
-          </th>
-        ))}
+        {headings.map(
+          (col, index) =>
+            col.show && (
+              <th
+                key={index}
+                scope="col"
+                className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-stone-300"
+              >
+                {col.label}
+              </th>
+            )
+        )}
       </tr>
     </thead>
   );

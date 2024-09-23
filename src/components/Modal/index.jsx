@@ -1,12 +1,22 @@
-import { cloneElement, createContext, useContext, useState } from "react";
+import { cloneElement, createContext, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 const ModalContext = createContext();
+
+function escListener(e, close) {
+  if (e.key.toLowerCase() === "escape") close();
+}
 
 function Modal({ children }) {
   const [isOpen, setIsOpen] = useState(false);
   const open = () => setIsOpen(true);
   const close = () => setIsOpen(false);
+
+  useEffect(() => {
+    document.addEventListener("keyup", (e) => escListener(e, close));
+
+    return () => document.removeEventListener("keyup", (e) => escListener(e, close));
+  }, []);
 
   return <ModalContext.Provider value={{ open, close, isOpen }}>{children}</ModalContext.Provider>;
 }
