@@ -1,3 +1,4 @@
+import { useForm } from "react-hook-form";
 import Table from "./Table/Table";
 
 function GuestsTable({ guests }) {

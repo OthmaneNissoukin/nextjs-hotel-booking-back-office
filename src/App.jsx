@@ -9,6 +9,8 @@ import "./charts/ChartjsConfig";
 import Rooms from "./pages/Rooms";
 import Layout from "./ui/Layout";
 import Guests from "./pages/Guests";
+import NewRoom from "./pages/NewRoom";
+import NewGuest from "./pages/NewGuest";
 
 function App() {
   const location = useLocation();
@@ -25,7 +27,9 @@ function App() {
         <Route element={<Layout />}>
           <Route exact path="/" element={<Rooms />} />
           <Route exact path="/rooms" element={<Rooms />} />
+          <Route exact path="/rooms/new" element={<NewRoom />} />
           <Route exact path="/guests" element={<Guests />} />
+          <Route exact path="/guests/new" element={<NewGuest />} />
         </Route>
         {/* <Route exact path="/" element={<Dashboard />} /> */}
       </Routes>
