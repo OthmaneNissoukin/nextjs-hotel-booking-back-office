@@ -13,27 +13,27 @@ function GuestsTable({ guests, tableHeadings = [] }) {
 
               {guests.map((item, index) => (
                 <Table.Row>
-                  {headings.find((col) => col.label === "#" && col.show === true) && (
+                  {tableHeadings.find((col) => col.label === "#" && col.show === true) && (
                     <Table.Cell>{index + 1}</Table.Cell>
                   )}
 
-                  {headings.find((col) => col.label === "Fullname" && col.show === true) && (
+                  {tableHeadings.find((col) => col.label === "Fullname" && col.show === true) && (
                     <Table.Cell>{item.fullname}</Table.Cell>
                   )}
 
-                  {headings.find((col) => col.label === "NationalID" && col.show === true) && (
+                  {tableHeadings.find((col) => col.label === "NationalID" && col.show === true) && (
                     <Table.Cell>{item.nationalID ? item.nationalID : "- - - -"}</Table.Cell>
                   )}
 
-                  {headings.find((col) => col.label === "Email" && col.show === true) && (
+                  {tableHeadings.find((col) => col.label === "Email" && col.show === true) && (
                     <Table.Cell>{item.email}</Table.Cell>
                   )}
 
-                  {headings.find((col) => col.label === "Phone" && col.show === true) && (
+                  {tableHeadings.find((col) => col.label === "Phone" && col.show === true) && (
                     <Table.Cell>{item.phone ? item.phone : "- - - -"}</Table.Cell>
                   )}
 
-                  {headings.find((col) => col.label === "Nationality" && col.show === true) && (
+                  {tableHeadings.find((col) => col.label === "Nationality" && col.show === true) && (
                     <Table.Cell>
                       {item.nationality ? (
                         <div className="flex items-center gap-3">
@@ -48,7 +48,7 @@ function GuestsTable({ guests, tableHeadings = [] }) {
                     </Table.Cell>
                   )}
 
-                  {headings.find((col) => col.label === "Actions" && col.show === true) && (
+                  {tableHeadings.find((col) => col.label === "Actions" && col.show === true) && (
                     <Table.Cell>
                       <button
                         type="button"

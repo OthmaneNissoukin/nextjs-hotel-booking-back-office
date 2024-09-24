@@ -1,6 +1,4 @@
 function Checkbox({ label = "Toggle Me", isActive = "", handleSwitch }) {
-  console.log({ label, isActive });
-
   return (
     <div>
       <label class="inline-flex items-center mb-5 cursor-pointer">
