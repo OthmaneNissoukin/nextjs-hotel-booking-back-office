@@ -1,15 +1,27 @@
 import { useForm } from "react-hook-form";
+import { createGuest } from "../services/supabase/guests";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 function NewGuest() {
+  const navigate = useNavigate();
   const {
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     handleSubmit,
+    reset,
   } = useForm();
 
+  const { mutate, isPending, isSuccess } = useMutation({
+    mutationFn: async (data) => await createGuest(data),
+  });
+
   async function onSubmit(data) {
-    await new Promise((res) => setTimeout(res, 5000));
-    console.log(data);
+    mutate(data);
+    if (isSuccess) {
+      reset();
+      navigate("/guests");
+    }
   }
 
   return (
@@ -102,7 +114,7 @@ function NewGuest() {
           <input
             type="text"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register("phone", { required: true })}
+            {...register("nationality", { required: true })}
           />
           {errors.nationality?.type === "required" && (
             <p className="text-sm text-red-700 italic">Nationality is required</p>
@@ -112,9 +124,9 @@ function NewGuest() {
         <div className="mt-5 flex gap-5 justify-end">
           <button
             className="px-8 py-2 bg-blue-700 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
-            disabled={isSubmitting}
+            disabled={isPending}
           >
-            {isSubmitting ? "Submitting..." : "Save"}
+            {isPending ? "Submitting..." : "Save"}
           </button>
         </div>
       </form>

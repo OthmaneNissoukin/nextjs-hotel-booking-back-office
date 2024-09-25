@@ -11,6 +11,7 @@ import Layout from "./ui/Layout";
 import Guests from "./pages/Guests";
 import NewRoom from "./pages/NewRoom";
 import NewGuest from "./pages/NewGuest";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const location = useLocation();
@@ -25,7 +26,7 @@ function App() {
     <>
       <Routes>
         <Route element={<Layout />}>
-          <Route exact path="/" element={<Rooms />} />
+          <Route exact path="/" element={<Dashboard />} />
           <Route exact path="/rooms" element={<Rooms />} />
           <Route exact path="/rooms/new" element={<NewRoom />} />
           <Route exact path="/guests" element={<Guests />} />

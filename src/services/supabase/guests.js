@@ -59,20 +59,8 @@ export async function updateGuestWithPwd(id, name, nationality, countryFlag, pho
   return data;
 }
 
-export async function createGuest(
-  fullname,
-  email,
-  avatar = "",
-  password = "",
-  phone = "",
-  nationality = "",
-  countryFlag = "",
-  nationalID = ""
-) {
-  const { data, error } = await supabase
-    .from("guests")
-    .insert([{ fullname, email, phone, avatar, nationality, countryFlag, nationalID, password }])
-    .select();
+export async function createGuest(guest) {
+  const { data, error } = await supabase.from("guests").insert([guest]).select();
 
   if (error) {
     console.log("ERROR SUPABASE");
@@ -80,4 +68,13 @@ export async function createGuest(
   }
 
   return data;
+}
+
+export async function deleteGuest(guestID) {
+  const { error } = await supabase.from("guests").delete().eq("id", guestID);
+
+  if (error) {
+    console.log("ERROR SUPABASE");
+    console.log(error);
+  }
 }

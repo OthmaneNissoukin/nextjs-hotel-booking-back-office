@@ -43,7 +43,7 @@ function Overlay({ children }) {
 function Wrapper({ children }) {
   return (
     <div className="absolute top-0 left-0 w-full h-[100dvh] flex justify-center items-center z-60">
-      <div className="backdrop-blur-sm backdrop-brightness-50 w-full h-full">{children}</div>
+      <div className="backdrop-blur-sm backdrop-brightness-50 w-full h-full ">{children}</div>
     </div>
   );
 }

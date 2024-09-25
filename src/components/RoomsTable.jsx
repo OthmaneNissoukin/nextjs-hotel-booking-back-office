@@ -22,21 +22,25 @@ function RoomsTable({ rooms, headings }) {
                     </Table.Cell>
                   )}
 
-                  {headings.find((col) => col.label === "Capacity" && col.show) && (
+                  {headings.find((col) => col.label === "name" && col.show) && (
+                    <Table.Cell>{String(item.name).padStart(2, "0")}</Table.Cell>
+                  )}
+
+                  {headings.find((col) => col.label === "capacity" && col.show) && (
                     <Table.Cell>{String(item.capacity).padStart(2, "0")}</Table.Cell>
                   )}
-                  {headings.find((col) => col.label === "Price" && col.show) && (
+                  {headings.find((col) => col.label === "price" && col.show) && (
                     <Table.Cell>${item.price.toFixed(2)}</Table.Cell>
                   )}
-                  {headings.find((col) => col.label === "Discount" && col.show) && (
+                  {headings.find((col) => col.label === "discount" && col.show) && (
                     <Table.Cell>${item.discount.toFixed(2)}</Table.Cell>
                   )}
-                  {headings.find((col) => col.label === "Available" && col.show) && (
+                  {headings.find((col) => col.label === "status" && col.show) && (
                     <Table.Cell>
                       <Table.Cell>STATIC</Table.Cell>
                     </Table.Cell>
                   )}
-                  {headings.find((col) => col.label === "Actions" && col.show) && (
+                  {headings.find((col) => col.label === "actions" && col.show) && (
                     <Table.Cell>
                       <button
                         type="button"

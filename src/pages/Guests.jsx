@@ -49,15 +49,15 @@ function Guests() {
 
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
-  const [tempGuests, setTempGuests] = useState(dummyGuests);
+  const [tempGuests, setTempGuests] = useState(null);
 
   function handleSearch(str) {
     setSearch(str);
     if (!str.trim() == "") {
-      setTempGuests(dummyGuests);
+      setTempGuests(guests);
     }
 
-    const filteredGuests = dummyGuests.filter(
+    const filteredGuests = guests.filter(
       (item) =>
         item.nationalID.toLowerCase().includes(str) ||
         item.fullname.toLowerCase().includes(str) ||
@@ -97,7 +97,7 @@ function Guests() {
           </Link>
         </div>
       </div>
-      <GuestsTable guests={tempGuests ?? []} tableHeadings={headings} />
+      <GuestsTable guests={tempGuests ?? guests} tableHeadings={headings} />
     </SectionContainer>
   );
 }

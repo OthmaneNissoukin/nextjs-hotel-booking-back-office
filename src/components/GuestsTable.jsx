@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import Table from "./Table/Table";
 import { formatCountry } from "../utils/Utils";
+import Modal from "./Modal";
+import GuestDelete from "./GuestDelete";
 
 function GuestsTable({ guests, tableHeadings = [] }) {
   return (
@@ -50,12 +52,7 @@ function GuestsTable({ guests, tableHeadings = [] }) {
 
                   {tableHeadings.find((col) => col.label === "Actions" && col.show === true) && (
                     <Table.Cell>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-800 focus:outline-none focus:text-red-800 disabled:opacity-50 disabled:pointer-events-none dark:text-red-500 dark:hover:text-red-400 dark:focus:text-red-400"
-                      >
-                        Delete
-                      </button>
+                      <GuestDelete guestName={item.fullname} guestID={item.id} />
                     </Table.Cell>
                   )}
                 </Table.Row>
