@@ -13,6 +13,7 @@ import NewRoom from "./pages/NewRoom";
 import NewGuest from "./pages/NewGuest";
 import Dashboard from "./pages/Dashboard";
 import EditGuest from "./pages/EditGuest";
+import EditRoom from "./pages/EditRoom";
 
 function App() {
   const location = useLocation();
@@ -30,6 +31,7 @@ function App() {
           <Route exact path="/" element={<Dashboard />} />
           <Route exact path="/rooms" element={<Rooms />} />
           <Route exact path="/rooms/new" element={<NewRoom />} />
+          <Route exact path="/rooms/edit/:id" element={<EditRoom />} />
           <Route exact path="/guests" element={<Guests />} />
           <Route exact path="/guests/new" element={<NewGuest />} />
           <Route exact path="/guests/edit/:id" element={<EditGuest />} />

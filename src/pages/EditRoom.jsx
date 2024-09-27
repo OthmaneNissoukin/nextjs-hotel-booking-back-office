@@ -1,24 +1,33 @@
 import { useForm } from "react-hook-form";
-import Modal from "../components/Modal";
-import { useMutation } from "@tanstack/react-query";
-import { createRoom } from "../services/supabase/rooms";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createRoom, getRoomById, updateRoom } from "../services/supabase/rooms";
 import toast, { Toaster } from "react-hot-toast";
+import { useParams } from "react-router-dom";
 
-function NewRoom() {
+function EditRoom() {
+  const { id } = useParams();
+  const {
+    data: room,
+    error,
+    isFetching,
+  } = useQuery({ queryKey: ["roomsEdit"], staleTime: 60 * 60 * 60, queryFn: async () => await getRoomById(id) });
+
   const {
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors },
   } = useForm();
 
+  const query = useQueryClient();
+
   const { mutate, isPending } = useMutation({
     mutationKey: ["rooms"],
-    mutationFn: async (data) => await createRoom(data, data.thumbnail[0], Array.from(data.images)),
+    mutationFn: async (data) => await updateRoom(parseInt(id), data, data.thumbnail[0], Array.from(data.images)),
     onSuccess: () => {
       reset();
-      toast.success("Room has been created successfully!");
+      query.invalidateQueries(["rooms"]);
+      toast.success("Room has been updated successfully!");
     },
     onError: (err) => console.log("Error", err),
   });
@@ -29,9 +38,17 @@ function NewRoom() {
     // console.log(errors);
     mutate(data);
   }
+
+  if (isFetching) return <h1>Loading...</h1>;
+  if (error) {
+    console.log(error);
+    return <h1>Error occured</h1>;
+  }
+  if (!room) return <h1>No room was found</h1>;
+
   return (
     <div className="p-5">
-      <h1 className="font-semibold text-2xl mb-7">New Room</h1>
+      <h1 className="font-semibold text-2xl mb-7">Edit Room</h1>
       <form action="" onSubmit={handleSubmit(onSubmitForm)}>
         <div className="grid md:grid-cols-2 gap-5">
           <div className="flex flex-col gap-2">
@@ -40,6 +57,7 @@ function NewRoom() {
             </label>
             <input
               type="text"
+              defaultValue={room.name}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register("name", { maxLength: 64, minLength: "6", required: true })}
             />
@@ -57,15 +75,12 @@ function NewRoom() {
               Thumbnail
             </label>
             <input
-              {...register("thumbnail", { required: true })}
+              {...register("thumbnail", { required: false })}
               type="file"
               accept="image/*"
               className="block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-sm file:font-semibold file:bg-slate-600 file:text-white hover:file:bg-slate-700 file:disabled:opacity-50 file:disabled:pointer-events-none dark:text-neutral-500 dark:file:bg-slate-500 dark:hover:file:bg-slate-400 cursor-pointer file:cursor-pointer border dark:border-slate-800 dark:bg-gray-700 border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500
       "
             />
-            {errors.thumbnail?.type === "required" && (
-              <p className="text-sm text-red-700 italic">Thumbail is required</p>
-            )}
           </div>
         </div>
 
@@ -76,6 +91,7 @@ function NewRoom() {
             </label>
             <input
               type="number"
+              defaultValue={room.capacity}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register("capacity", { max: 12, min: 1, required: true })}
             />
@@ -95,6 +111,7 @@ function NewRoom() {
             </label>
             <input
               type="number"
+              defaultValue={room.sleeps}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register("sleeps", { max: 6, min: 1, required: true })}
             />
@@ -114,6 +131,7 @@ function NewRoom() {
             </label>
             <input
               type="number"
+              defaultValue={room.price}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register("price", { min: 25, max: 200, required: true })}
             />
@@ -130,6 +148,7 @@ function NewRoom() {
             {/* TODO: DISCOUNT MAX VALUE MUST BE LESS THAN THE PRICE ITSELF. ADD THE LOGIC LATER */}
             <input
               type="number"
+              defaultValue={room.discount}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register("discount", { max: 100, min: 0, required: true, value: 0 })}
             />
@@ -153,7 +172,7 @@ function NewRoom() {
             type="file"
             accept="image/*"
             multiple
-            {...register("images", { required: true })}
+            {...register("images", { required: false })}
             className="block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-sm file:font-semibold file:bg-slate-600 file:text-white hover:file:bg-slate-700 file:disabled:opacity-50 file:disabled:pointer-events-none dark:text-neutral-500 dark:file:bg-slate-500 dark:hover:file:bg-slate-400 cursor-pointer file:cursor-pointer border dark:border-slate-800 dark:bg-gray-700 border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500
       "
           />
@@ -167,6 +186,7 @@ function NewRoom() {
           {/* TODO: DISCOUNT MAX VALUE MUST BE LESS THAN THE PRICE ITSELF. ADD THE LOGIC LATER */}
           <textarea
             rows={8}
+            defaultValue={room.description}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-y"
             {...register("description", { maxLength: 3000, minLength: 120, required: true })}
           ></textarea>
@@ -195,4 +215,4 @@ function NewRoom() {
   );
 }
 
-export default NewRoom;
+export default EditRoom;
