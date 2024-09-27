@@ -44,3 +44,7 @@ export const formatCountry = (nationality) => {
       .toUpperCase();
   else return nationality;
 };
+
+export const generateSlug = (str) => {
+  return str.toLowerCase().split(" ").join("-");
+};

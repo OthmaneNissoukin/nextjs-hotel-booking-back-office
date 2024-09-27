@@ -71,7 +71,7 @@ function Guests() {
 
   if (error) return <h1>Error, Please check your network and try again</h1>;
 
-  // if (!guests) return <h1>No guest was found</h1>;
+  if (!guests) return <h1>No guest was found. Please check your network</h1>;
 
   return (
     <SectionContainer label={"Guests"} description={"List of all the registered guests"}>

@@ -1,11 +1,18 @@
 import { useForm } from "react-hook-form";
-import { createGuest } from "../services/supabase/guests";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { createGuest, getGuestById, updateGuest } from "../services/supabase/guests";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import SelectCountry from "../components/CountrySelector";
 
-function NewGuest() {
-  const navigate = useNavigate();
+function EditGuest() {
+  const { id } = useParams();
+  const query = useQueryClient();
+  const {
+    data: guest,
+    error,
+    isFetching,
+  } = useQuery({ queryKey: ["editedUser"], staleTime: 60 * 60 * 60, queryFn: async () => getGuestById(id) });
+
   const {
     register,
     formState: { errors },
@@ -14,10 +21,9 @@ function NewGuest() {
   } = useForm();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (data) => await createGuest(data),
+    mutationFn: async (data) => await updateGuest(id, data),
     onSuccess: () => {
-      reset();
-      navigate("/guests");
+      query.invalidateQueries(["editedUser"]);
     },
   });
 
@@ -29,6 +35,11 @@ function NewGuest() {
     }
     mutate(data);
   }
+
+  if (isFetching) return "Loading Guest...";
+  if (error) return "Error occured !!!";
+
+  if (!guest) return "Guest not found!";
 
   return (
     <div className="p-5">
@@ -42,7 +53,7 @@ function NewGuest() {
             <input
               type="text"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              {...register("fullname", { maxLength: 32, minLength: 3, required: true })}
+              {...register("fullname", { maxLength: 32, minLength: 3, required: true, value: guest.fullname })}
             />
             {errors.fullname?.type === "min" && (
               <p className="text-sm text-red-700 italic">Fullname must contain at least 3 charcters</p>
@@ -66,6 +77,7 @@ function NewGuest() {
                 minLength: 5,
                 pattern: "/^[a-zA-Z0-9]{6,12}$/",
                 required: true,
+                value: guest.nationalID,
               })}
             />
             {errors.nationalID?.type === "min" && (
@@ -89,7 +101,7 @@ function NewGuest() {
             <input
               type="text"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              {...register("email", { required: true })}
+              {...register("email", { required: true, value: guest.email })}
             />
 
             {errors.email?.type === "pattern" && <p className="text-sm text-red-700 italic">Email is invalid</p>}
@@ -103,7 +115,7 @@ function NewGuest() {
             <input
               type="text"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              {...register("phone", { minLength: 8, required: true })}
+              {...register("phone", { minLength: 8, required: true, value: guest.phone })}
             />
             {errors.phone?.type === "min" && (
               <p className="text-sm text-red-700 italic">Phone must contain at least 8 charcters</p>
@@ -114,11 +126,15 @@ function NewGuest() {
           </div>
         </div>
         <div className="flex flex-col gap-2 mt-5">
-          <label htmlFor="" className="font-semibold">
-            Nationality
+          <label htmlFor="" className="font-semibold flex items-center gap-3">
+            <span>Nationality</span>{" "}
+            <span className="inline-block w-7  overflow-hidden">
+              <img src={guest.countryFlag} alt={`${guest.nationality} flag`} className="w-full" />
+            </span>
           </label>
           <SelectCountry
             register={register}
+            defaultCountry={guest.nationality}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
           {errors.nationality?.type === "required" && (
@@ -131,7 +147,7 @@ function NewGuest() {
             className="px-8 py-2 bg-blue-700 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
             disabled={isPending}
           >
-            {isPending ? "Submitting..." : "Save"}
+            {isPending ? "Updating..." : "Save"}
           </button>
         </div>
       </form>
@@ -139,4 +155,4 @@ function NewGuest() {
   );
 }
 
-export default NewGuest;
+export default EditGuest;

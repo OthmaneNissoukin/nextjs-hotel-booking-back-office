@@ -25,12 +25,8 @@ export async function getGuestByEmail(email) {
   return guests;
 }
 
-export async function updateGuest(id, name, nationality, countryFlag, phone, email) {
-  const { data, error } = await supabase
-    .from("guests")
-    .update({ fullname: name, nationality, phone, email, countryFlag })
-    .eq("id", id)
-    .select();
+export async function updateGuest(id, guest) {
+  const { data, error } = await supabase.from("guests").update(guest).eq("id", id).select();
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 

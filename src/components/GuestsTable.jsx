@@ -3,7 +3,7 @@ import Table from "./Table/Table";
 import { formatCountry } from "../utils/Utils";
 import Modal from "./Modal";
 import GuestDelete from "./GuestDelete";
-
+import { Link } from "react-router-dom";
 function GuestsTable({ guests, tableHeadings = [] }) {
   return (
     <div className="flex flex-col">
@@ -52,6 +52,12 @@ function GuestsTable({ guests, tableHeadings = [] }) {
 
                   {tableHeadings.find((col) => col.label === "Actions" && col.show === true) && (
                     <Table.Cell>
+                      <Link
+                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
+                        to={`/guests/edit/${item.id}`}
+                      >
+                        Edit
+                      </Link>
                       <GuestDelete guestName={item.fullname} guestID={item.id} />
                     </Table.Cell>
                   )}

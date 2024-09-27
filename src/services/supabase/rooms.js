@@ -1,3 +1,4 @@
+import { generateSlug } from "../../utils/Utils";
 import supabase from "./db";
 
 export async function getAllRooms() {
@@ -41,4 +42,75 @@ export async function filterRoomsByDate(start = "2024-09-21", end = "2024-09-27"
     .not("id", "in", `(${reservations_ids.join(",")})`);
 
   return rooms;
+}
+
+export async function createRoom(roomObj, roomThumbnail, roomImages) {
+  const thumbnailName = `${new Date().getTime()}`;
+  const { data: thumbnail, error: thumbnailError } = await supabase.storage
+    .from("rooms-imgs")
+    .upload(thumbnailName, roomThumbnail);
+  if (thumbnailError) {
+    throw new Error("Failed to upload the thumbnail");
+  }
+
+  const roomCols = {
+    thumbnail: thumbnailName,
+    name: roomObj.name,
+    capacity: roomObj.capacity,
+    price: roomObj.price,
+    description: roomObj.description,
+    sleeps: roomObj.sleeps,
+    available: roomObj.available,
+    discount: roomObj.discount,
+    slug: generateSlug(roomObj.name),
+  };
+  const { data: room, error: roomError } = await supabase.from("rooms").insert([roomCols]).select().single();
+
+  console.log("room err", roomError);
+
+  const createdImages = [];
+  const uploadFlag = false;
+  for (let i = 0; i < roomImages.length; i++) {
+    const imgName = `${new Date().getTime()}`;
+    console.log(`IMG (${i}) => ${imgName}`);
+    console.log(roomImages[i]);
+    const { data: img, error: imagesError } = await supabase.storage.from("rooms-imgs").upload(imgName, roomImages[i]);
+
+    if (imagesError) {
+      console.log("Images error =>");
+      console.log(imagesError);
+      uploadFlag = true;
+      break;
+    }
+  }
+
+  let galleryFlag = false;
+  if (!uploadFlag) {
+    const createdGallery = createdImages.map((item) => ({ img_path: item, room_id: room.id }));
+
+    const { data: roomGallery, error: galleryError } = await supabase
+      .from("room_images")
+      .insert(createdGallery)
+      .select();
+
+    if (galleryError) galleryFlag = true;
+  }
+
+  if (roomError || uploadFlag || galleryFlag) {
+    console.log("inserted room => ", room);
+    await supabase.storage.from("rooms-imgs").remove([thumbnailName, ...createdImages]);
+    await supabase.from("rooms").delete().eq("id", room.id);
+
+    throw new Error("Failed to create room");
+  }
+
+  return room;
+}
+
+export async function deleteRoom(id) {
+  const { error } = await supabase.from("rooms").delete().eq("id", id);
+
+  if (error) {
+    throw new Error("Failed to delete the room");
+  }
 }

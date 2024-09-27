@@ -2,14 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "./Modal";
 import { deleteGuest } from "../services/supabase/guests";
 import { useRef } from "react";
+import { deleteRoom } from "../services/supabase/rooms";
 
-function GuestDelete({ guestName, guestID }) {
+function RoomDelete({ roomName, roomID }) {
   const closeRef = useRef(null);
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: async () => await deleteGuest(guestID),
+    mutationFn: async () => await deleteRoom(roomID),
     onSuccess: () => {
-      queryClient.invalidateQueries(["guests"]);
+      queryClient.invalidateQueries(["rooms"]);
       closeRef.click();
     },
   });
@@ -26,8 +27,8 @@ function GuestDelete({ guestName, guestID }) {
       <Modal.Overlay>
         <Modal.Wrapper>
           <div className="w-[90%] max-w-[620px] p-5 mt-5 bg-slate-900 rounded-sm mx-auto">
-            <h2 className="text-2xl">Delete {guestName}</h2>
-            <p className="mb-10 text-sm">This action cannot be undone. Are you sure to delete this guest?</p>
+            <h2 className="text-2xl">Delete {roomName}</h2>
+            <p className="mb-10 text-sm">This action cannot be undone. Are you sure to delete this room?</p>
             <div className="flex justify-end items-center gap-3">
               <Modal.ToggleClose>
                 <button
@@ -53,4 +54,4 @@ function GuestDelete({ guestName, guestID }) {
   );
 }
 
-export default GuestDelete;
+export default RoomDelete;
