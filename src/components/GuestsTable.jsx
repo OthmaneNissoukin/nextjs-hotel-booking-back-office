@@ -1,9 +1,8 @@
-import { useForm } from "react-hook-form";
 import Table from "./Table/Table";
 import { formatCountry } from "../utils/Utils";
-import Modal from "./Modal";
-import GuestDelete from "./GuestDelete";
 import { Link } from "react-router-dom";
+import DeletionModal from "./DeletionModal";
+import { deleteGuest } from "../services/supabase/guests";
 function GuestsTable({ guests, tableHeadings = [] }) {
   return (
     <div className="flex flex-col">
@@ -58,7 +57,11 @@ function GuestsTable({ guests, tableHeadings = [] }) {
                       >
                         Edit
                       </Link>
-                      <GuestDelete guestName={item.fullname} guestID={item.id} />
+                      <DeletionModal
+                        queryKey={"guests"}
+                        targetName={item.fullname}
+                        mutationFuntion={async () => deleteGuest(item.id)}
+                      />
                     </Table.Cell>
                   )}
                 </Table.Row>
