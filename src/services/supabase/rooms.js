@@ -69,7 +69,7 @@ export async function createRoom(roomObj, roomThumbnail, roomImages) {
   console.log("room err", roomError);
 
   const createdImages = [];
-  const uploadFlag = false;
+  let uploadFlag = false;
   for (let i = 0; i < roomImages.length; i++) {
     const imgName = `${new Date().getTime()}`;
     console.log(`IMG (${i}) => ${imgName}`);
@@ -146,7 +146,7 @@ export async function updateRoom(id, roomObj, roomThumbnail, roomImages) {
   if (!roomImages) return;
 
   const createdImages = [];
-  const uploadFlag = false;
+  let uploadFlag = false;
   for (let i = 0; i < roomImages.length; i++) {
     const imgName = `${new Date().getTime()}`;
     console.log(`IMG (${i}) => ${imgName}`);

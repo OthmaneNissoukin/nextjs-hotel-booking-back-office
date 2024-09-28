@@ -8,3 +8,30 @@
 @import 'additional-styles/flatpickr.css';
 
 @import 'tailwindcss/utilities';
+
+
+/* adjusting react select styles */
+/* .css-13cymwt-control, .css-t3ipsp-control {
+  background-color: inherit !important;
+  height: 100%;
+}
+*/
+/* .css-1nmdiq5-menu {
+  display: block !important;
+}  */
+
+/* .css-hlgwow {
+  background-color: inherit !important;
+} */
+
+/* .css-1nmdiq5-menu div div {
+  background-color: inherit !important;
+}
+
+.css-1nmdiq5-menu div div:hover {
+  background-color: #d3d3d3 !important;
+}
+*/
+.css-19bb58m {
+  color: yellow !important;
+} 
