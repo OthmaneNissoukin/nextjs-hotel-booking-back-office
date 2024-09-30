@@ -2,7 +2,7 @@ import { generateSlug } from "../../utils/Utils";
 import supabase from "./db";
 
 export async function getAllRooms() {
-  let { data: rooms, error } = await supabase.from("rooms").select("*");
+  let { data: rooms, error } = await supabase.from("rooms").select("*, reservations(start_date, end_date, status)");
 
   // await new Promise((res) => setTimeout(res, 2000));
 

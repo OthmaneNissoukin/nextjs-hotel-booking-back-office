@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import EditGuest from "./pages/EditGuest";
 import EditRoom from "./pages/EditRoom";
 import NewReservation from "./pages/NewReservation";
+import Reservations from "./pages/Reservations";
 
 function App() {
   const location = useLocation();
@@ -36,6 +37,7 @@ function App() {
           <Route exact path="/guests" element={<Guests />} />
           <Route exact path="/guests/new" element={<NewGuest />} />
           <Route exact path="/guests/edit/:id" element={<EditGuest />} />
+          <Route exact path="/reservations" element={<Reservations />} />
           <Route exact path="/reservations/new" element={<NewReservation />} />
         </Route>
         {/* <Route exact path="/" element={<Dashboard />} /> */}

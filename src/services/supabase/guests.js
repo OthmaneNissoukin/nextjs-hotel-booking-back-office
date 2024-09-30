@@ -67,7 +67,7 @@ export async function createGuest(guest) {
 }
 
 export async function deleteGuest(guestID) {
-  const { error } = await supabase.from("guests").delete().eq("id", guestID);
+  const { error } = await supabase.from("guests").update("deleted_at", new Date()).eq("id", guestID);
 
   if (error) {
     console.log("ERROR SUPABASE");

@@ -8,7 +8,7 @@ import FormSelect from "../components/FormSelect";
 import { getAllRooms } from "../services/supabase/rooms";
 import { format, areIntervalsOverlapping, isBefore } from "date-fns";
 
-function NewReservation() {
+function EditReservation() {
   const [bookingPeriod, setBookingPeriod] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
@@ -274,4 +274,4 @@ function NewReservation() {
   );
 }
 
-export default NewReservation;
+export default EditReservation;

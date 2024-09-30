@@ -2,21 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 import { getAllGuests } from "../services/supabase/guests";
 import { useThemeProvider } from "../utils/ThemeContext";
-function GuestsSelect() {
+function FormSelect({ options, placeholder, onChange }) {
   const { currentTheme, changeCurrentTheme } = useThemeProvider();
-  const {
-    data: guests,
-    error: guestsError,
-    isFetching,
-  } = useQuery({ queryKey: ["guests"], queryFn: async () => getAllGuests() });
 
   return (
     <Select
+      onChange={(v) => onChange(v.value)}
       name="guests"
-      placeholder="-- Select a Guest --"
+      placeholder={placeholder}
       styles={{
         singleValue: (base) => ({ ...base, color: currentTheme === "dark" ? "#fff" : base.color }),
-        input: (base) => ({ ...base, outline: "none", border: "none" }),
       }}
       classNames={{
         dropdownIndicator: () => "bg-gray-50 dark:bg-gray-700 h-full",
@@ -31,13 +26,11 @@ function GuestsSelect() {
         option: () => "hover:text-slate-700",
         singleValue: () => "text-red-700",
       }}
-      isLoading={isFetching}
       isSearchable={true}
-      isDisabled={isFetching}
-      // options={guests?.map((item) => ({ label: `${item.fullname} - ${item.nationalID}`, value: item.id }))}
-      options={[1, 2, 3, 4, 5].map((item) => ({ label: `A-${parseInt(item * Math.random() * 100)}`, value: item }))}
+      options={options}
+      // options={[1, 2, 3, 4, 5].map((item) => ({ label: `A-${parseInt(item * Math.random() * 100)}`, value: item }))}
     />
   );
 }
 
-export default GuestsSelect;
+export default FormSelect;
