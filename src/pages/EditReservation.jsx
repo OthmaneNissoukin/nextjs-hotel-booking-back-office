@@ -1,42 +1,26 @@
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { createGuest, getAllGuests } from "../services/supabase/guests";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DatePicker from "react-flatpickr";
 import { useEffect, useRef, useState } from "react";
 import FormSelect from "../components/FormSelect";
 import { getAllRooms } from "../services/supabase/rooms";
-import { format, areIntervalsOverlapping, isBefore } from "date-fns";
+import { format, areIntervalsOverlapping, isBefore, subDays, isAfter } from "date-fns";
+import toast, { Toaster } from "react-hot-toast";
+import { getReservationByID, updateReseration } from "../services/supabase/reservations";
 
 function EditReservation() {
+  const { id: reservationID } = useParams();
   const [bookingPeriod, setBookingPeriod] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [selectedGuest, setSelectedGuest] = useState(null);
   const [disabledDays, setDisabledDays] = useState([]);
+  const [targetRoom, setTargetRoom] = useState(null);
   const ref = useRef(null);
-
-  useEffect(() => {
-    console.log(ref.current);
-    ref?.current?.flatpickr.clear();
-    if (!selectedRoom) return;
-
-    const targetRoom = rooms.find((item) => item.id === selectedRoom);
-    setDisabledDays(
-      targetRoom.reservations?.map((item) => ({
-        from: new Date(item.start_date),
-        to: new Date(item.end_date),
-      }))
-    );
-
-    console.log(
-      targetRoom.reservations?.map((item) => ({
-        start: new Date(item.start_date),
-        end: new Date(item.end_date),
-      }))
-    );
-  }, [selectedRoom]);
+  const query = useQueryClient();
 
   const navigate = useNavigate();
+
   const {
     register,
     formState: { errors },
@@ -49,39 +33,68 @@ function EditReservation() {
   } = useForm();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (data) => await createGuest(data),
+    mutationFn: async (data) =>
+      await updateReseration(
+        reservationID,
+        data.roomID,
+        reservation.guest_id,
+        data.guests_count,
+        data.start_date,
+        data.end_date,
+        data.status
+      ),
     onSuccess: () => {
-      reset();
-      navigate("/guests");
+      // reset();
+      toast.success("Updated successfully!");
+      query.invalidateQueries({ queryKey: ["editedReservation"] });
+      query.invalidateQueries({ queryKey: ["reservations"] });
+    },
+    onError: (err) => {
+      toast.error("Failed to update!");
     },
   });
 
   const {
-    data: guests,
-    error: guestsError,
-    isFetchingGuests,
-  } = useQuery({ queryKey: ["guests"], queryFn: async () => getAllGuests() });
+    data: reservation,
+    error: reservationError,
+    isFetching: isFetchingReservation,
+  } = useQuery({
+    queryKey: ["editedReservation"],
+    queryFn: async () => getReservationByID(reservationID),
+    staleTime: 0,
+  });
+
   const {
     data: rooms,
     error: roomsError,
     isFetchingRooms,
-  } = useQuery({ queryKey: ["rooms"], queryFn: async () => getAllRooms() });
+    isSuccess,
+  } = useQuery({ queryKey: ["rooms"], queryFn: async () => getAllRooms(), staleTime: 60 * 60 * 60 });
 
-  const targetRoom = rooms?.find((item) => item.id === selectedRoom);
+  useEffect(() => {
+    // Target room is needed to get data for validation for a specific room
+    const targetRoom = rooms?.find((item) => item.id == selectedRoom || item.id == reservation?.room_id);
+    if (!targetRoom) return;
+    setTargetRoom(targetRoom);
+
+    setValue("roomID", selectedRoom ?? reservation.id);
+    setValue("booking_period", [reservation?.start_date, reservation?.end_date]);
+
+    setDisabledDays(
+      targetRoom?.reservations?.map((item) => ({
+        from: new Date(item.start_date),
+        to: new Date(item.end_date),
+      }))
+    );
+  }, [selectedRoom, reservation, rooms]);
 
   async function onSubmit(data) {
+    data.roomID = selectedRoom ? selectedRoom : reservation.room_id;
+    data.start_date = data.booking_period.at(0);
+    data.end_date = data.booking_period.at(1);
+
     console.log(data);
-    const targetRoom = rooms.find((item) => item.id == selectedRoom);
-    console.log(targetRoom);
-    if (!value?.at(0)) {
-      setError("start_date", { type: "required", message: "Heave! Required" });
-    }
-    // if (data.nationality) {
-    //   const [nationality, countryFlag] = data.nationality.split("%");
-    //   data.nationality = nationality;
-    //   data.countryFlag = countryFlag;
-    // }
-    // mutate(data);
+    mutate(data);
   }
 
   function handleArrivalSelect(value = []) {
@@ -91,13 +104,11 @@ function EditReservation() {
       return;
     }
 
+    console.log("DATE");
+    console.log(value);
+
     const start_date = new Date(value[0]);
     const end_date = new Date(value[1]);
-
-    if (!selectedRoom) {
-      setError("booking_period", { type: "missing_room", message: "Room must be selected first" });
-      return;
-    }
 
     const planned_room_reservations = targetRoom?.reservations.filter((item) =>
       item.status === "confirmed"
@@ -107,10 +118,6 @@ function EditReservation() {
           }
         : ""
     );
-    // const room_busy_days = planned_room_reservations?.map((item) => ({
-    //   start: new Date(item.start_date),
-    //   end: new Date(item.end_date),
-    // }));
 
     if (planned_room_reservations.find((item) => areIntervalsOverlapping(item, { start: start_date, end: end_date }))) {
       console.log("range_error");
@@ -121,19 +128,19 @@ function EditReservation() {
       return;
     }
 
-    setBookingPeriod(value);
-
-    // console.log(start_date);
-    // console.log(rooms?.find((item) => item.id === selectedRoom));
+    setValue("booking_period", value);
+    // setBookingPeriod(value);
   }
 
-  if (isFetchingGuests || isFetchingRooms) return <h1>Please wait...</h1>;
+  if (isFetchingReservation || isFetchingRooms) return <h1>Please wait...</h1>;
 
-  if (guestsError || roomsError) return <h1>Error occured!</h1>;
+  if (reservationError || roomsError) return <h1>Error occured!</h1>;
+
+  if (!reservation && !rooms) return <h1>Reservation not found!</h1>;
 
   return (
     <div className="p-5">
-      <h1 className="font-semibold text-2xl mb-7">New Guest</h1>
+      <h1 className="font-semibold text-2xl mb-7">Edit Reservation</h1>
       <form action="" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid md:grid-cols-2 gap-5">
           {/* GUEST SELECT */}
@@ -142,12 +149,14 @@ function EditReservation() {
               Guest
             </label>
 
-            <FormSelect
-              placeholder={"-- Select a Guest --"}
-              onChange={setSelectedGuest}
-              options={guests?.map((item) => ({ label: `${item.fullname} - ${item.nationalID}`, value: item.id }))}
+            <input
+              type="text"
+              defaultValue={
+                reservation?.guests ? `${reservation.guests.fullname} - ${reservation.guests.nationalID}` : ""
+              }
+              disabled={true}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 disabled:dark:bg-gray-800 disabled:cursor-not-allowed"
             />
-            <input type="hidden" value={selectedGuest} {...register("guestID", { required: true })} />
 
             {errors.guestID?.type === "required" && (
               <p className="text-sm text-red-700 italic">The guest is required</p>
@@ -158,15 +167,40 @@ function EditReservation() {
             <label htmlFor="" className="font-semibold">
               Room
             </label>
-            <FormSelect
-              onChange={setSelectedRoom}
-              options={rooms?.map((item) => ({
-                label: `${item.name} => (${item.capacity} guests | $${item.price.toFixed(2)})`,
-                value: item.id,
-              }))}
-              placeholder={"-- Select a Room --"}
-            />
-            <input type="hidden" value={selectedRoom} {...register("roomID", { required: true })} />
+
+            {/* PREVENT EDITING RESERVATION ROOM WHICH HAS BEEN CONFIRMED AND IS ALREADY STARTED */}
+            {reservation.status === "confirmed" && isAfter(new Date(), new Date(reservation.start_date)) ? (
+              <input
+                type="text"
+                defaultValue={`${reservation.rooms.name} => (${
+                  reservation.rooms.capacity
+                } guests | $${reservation.rooms.price.toFixed(2)})`}
+                disabled={true}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 disabled:dark:bg-gray-800 disabled:cursor-not-allowed"
+              />
+            ) : (
+              <>
+                <FormSelect
+                  onChange={() => setValue("roomID", selectedRoom)}
+                  defaultValue={{
+                    label: `${reservation.rooms.name} => (${
+                      reservation.rooms.capacity
+                    } guests | $${reservation.rooms.price.toFixed(2)})`,
+                  }}
+                  options={rooms?.map((item) => ({
+                    label: `${item.name} => (${item.capacity} guests | $${item.price.toFixed(2)})`,
+                    value: item.id,
+                  }))}
+                  placeholder={"-- Select a Room --"}
+                  setValue={setSelectedRoom}
+                />
+                <input
+                  type="hidden"
+                  value={selectedRoom ?? reservation?.id}
+                  {...register("roomID", { required: true })}
+                />
+              </>
+            )}
 
             {errors.roomID?.type === "required" && <p className="text-sm text-red-700 italic">The room is required</p>}
           </div>
@@ -177,6 +211,7 @@ function EditReservation() {
             </label>
             <input
               min={1}
+              defaultValue={reservation.guests_count}
               type="number"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register("guests_count", {
@@ -205,6 +240,7 @@ function EditReservation() {
             {/* ADD PHONE REGEX LATER */}
             <input
               type="number"
+              defaultValue={reservation.reserved_price}
               step={0.01}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {...register("price", {
@@ -232,14 +268,22 @@ function EditReservation() {
               onChange={(date) => handleArrivalSelect(date)}
               options={{
                 mode: "range",
-                dateFormat: "d-m-Y",
-                disable: [...disabledDays],
-                minDate: new Date(),
+                disable: selectedRoom
+                  ? [...disabledDays]
+                  : rooms
+                      ?.find((item) => item.id == reservation.room_id)
+                      .reservations.filter((item) => item.id != reservationID)
+                      .map((item) => ({
+                        from: new Date(item.start_date),
+                        to: new Date(item.end_date),
+                      })) ?? [],
+                minDate: isBefore(new Date(reservation.start_date), new Date())
+                  ? subDays(new Date(reservation.start_date), 1)
+                  : new Date(),
+                defaultDate: [reservation.start_date, reservation.end_date],
               }}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             />
-
-            {errors.booking_period && <p className="text-sm text-red-700 italic">{errors.booking_period.message}</p>}
           </div>
 
           {/* STATUS */}
@@ -249,10 +293,12 @@ function EditReservation() {
             </label>
             <select
               {...register("status", { required: true })}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              defaultValue={reservation.status}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 uppercase"
             >
               <option value="unconfirmed">Unconfirmed</option>
               <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
             </select>
             {errors.status?.type === "required" && (
               <p className="text-sm text-red-700 italic">Reservation status is required</p>
@@ -270,6 +316,8 @@ function EditReservation() {
           </button>
         </div>
       </form>
+
+      <Toaster position="top-center" />
     </div>
   );
 }

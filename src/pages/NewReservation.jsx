@@ -6,7 +6,9 @@ import DatePicker from "react-flatpickr";
 import { useEffect, useRef, useState } from "react";
 import FormSelect from "../components/FormSelect";
 import { getAllRooms } from "../services/supabase/rooms";
-import { format, areIntervalsOverlapping, isBefore } from "date-fns";
+import { areIntervalsOverlapping } from "date-fns";
+import { createNewReservation } from "../services/supabase/reservations";
+import toast, { Toaster } from "react-hot-toast";
 
 function NewReservation() {
   const [bookingPeriod, setBookingPeriod] = useState([]);
@@ -16,11 +18,11 @@ function NewReservation() {
   const ref = useRef(null);
 
   useEffect(() => {
+    if (!selectedRoom) return;
+    const targetRoom = rooms.find((item) => item.id === selectedRoom);
     console.log(ref.current);
     ref?.current?.flatpickr.clear();
-    if (!selectedRoom) return;
 
-    const targetRoom = rooms.find((item) => item.id === selectedRoom);
     setDisabledDays(
       targetRoom.reservations?.map((item) => ({
         from: new Date(item.start_date),
@@ -49,10 +51,24 @@ function NewReservation() {
   } = useForm();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (data) => await createGuest(data),
+    mutationFn: async (data) =>
+      await createNewReservation(
+        selectedRoom,
+        selectedGuest,
+        data.guests_count,
+        data.message,
+        data.price,
+        data.booking_period.at(0),
+        data.booking_period.at(1),
+        data.status
+      ),
     onSuccess: () => {
       reset();
-      navigate("/guests");
+      navigate("/reservations");
+    },
+    onError: (err) => {
+      toast.error("Failed to submit!");
+      console.log(err);
     },
   });
 
@@ -69,19 +85,10 @@ function NewReservation() {
 
   const targetRoom = rooms?.find((item) => item.id === selectedRoom);
 
-  async function onSubmit(data) {
+  function onSubmit(data) {
+    console.log("Submit()");
     console.log(data);
-    const targetRoom = rooms.find((item) => item.id == selectedRoom);
-    console.log(targetRoom);
-    if (!value?.at(0)) {
-      setError("start_date", { type: "required", message: "Heave! Required" });
-    }
-    // if (data.nationality) {
-    //   const [nationality, countryFlag] = data.nationality.split("%");
-    //   data.nationality = nationality;
-    //   data.countryFlag = countryFlag;
-    // }
-    // mutate(data);
+    mutate(data);
   }
 
   function handleArrivalSelect(value = []) {
@@ -107,10 +114,6 @@ function NewReservation() {
           }
         : ""
     );
-    // const room_busy_days = planned_room_reservations?.map((item) => ({
-    //   start: new Date(item.start_date),
-    //   end: new Date(item.end_date),
-    // }));
 
     if (planned_room_reservations.find((item) => areIntervalsOverlapping(item, { start: start_date, end: end_date }))) {
       console.log("range_error");
@@ -122,6 +125,7 @@ function NewReservation() {
     }
 
     setBookingPeriod(value);
+    setValue("booking_period", value);
 
     // console.log(start_date);
     // console.log(rooms?.find((item) => item.id === selectedRoom));
@@ -133,7 +137,7 @@ function NewReservation() {
 
   return (
     <div className="p-5">
-      <h1 className="font-semibold text-2xl mb-7">New Guest</h1>
+      <h1 className="font-semibold text-2xl mb-7">New Reservations</h1>
       <form action="" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid md:grid-cols-2 gap-5">
           {/* GUEST SELECT */}
@@ -144,7 +148,8 @@ function NewReservation() {
 
             <FormSelect
               placeholder={"-- Select a Guest --"}
-              onChange={setSelectedGuest}
+              onChange={() => setValue("guestID", selectedGuest)}
+              setValue={setSelectedGuest}
               options={guests?.map((item) => ({ label: `${item.fullname} - ${item.nationalID}`, value: item.id }))}
             />
             <input type="hidden" value={selectedGuest} {...register("guestID", { required: true })} />
@@ -159,7 +164,8 @@ function NewReservation() {
               Room
             </label>
             <FormSelect
-              onChange={setSelectedRoom}
+              onChange={() => setValue("roomID", selectedRoom)}
+              setValue={setSelectedRoom}
               options={rooms?.map((item) => ({
                 label: `${item.name} => (${item.capacity} guests | $${item.price.toFixed(2)})`,
                 value: item.id,
@@ -257,6 +263,8 @@ function NewReservation() {
             {errors.status?.type === "required" && (
               <p className="text-sm text-red-700 italic">Reservation status is required</p>
             )}
+
+            {errors ? console.log(errors) : ""}
           </div>
         </div>
 
@@ -270,6 +278,7 @@ function NewReservation() {
           </button>
         </div>
       </form>
+      <Toaster position="top-center" />
     </div>
   );
 }

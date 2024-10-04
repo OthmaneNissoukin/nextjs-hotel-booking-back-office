@@ -2,12 +2,28 @@ import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 import { getAllGuests } from "../services/supabase/guests";
 import { useThemeProvider } from "../utils/ThemeContext";
-function FormSelect({ options, placeholder, onChange }) {
+function FormSelect({
+  options,
+  placeholder,
+  setValue,
+  onChange,
+  disabled = false,
+  defaultValue = null,
+  isLoading = false,
+}) {
   const { currentTheme, changeCurrentTheme } = useThemeProvider();
+
+  function handleChange(option) {
+    setValue(option.value);
+    onChange?.();
+  }
 
   return (
     <Select
-      onChange={(v) => onChange(v.value)}
+      isDisabled={disabled}
+      isLoading={isLoading}
+      defaultValue={defaultValue}
+      onChange={handleChange}
       name="guests"
       placeholder={placeholder}
       styles={{
