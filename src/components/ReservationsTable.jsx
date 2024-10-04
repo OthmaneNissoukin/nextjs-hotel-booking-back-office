@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { deleteRoom } from "../services/supabase/rooms";
 import DeletionModal from "./DeletionModal";
 import Table from "./Table/Table";
+import { deleteReservation } from "../services/supabase/reservations";
+import { isAfter, isBefore } from "date-fns";
 
 function ReservationsTable({ reservations, headings }) {
   return (
@@ -37,17 +39,28 @@ function ReservationsTable({ reservations, headings }) {
                   {headings.find((col) => col.label === "status" && col.show) && <Table.Cell>{item.status}</Table.Cell>}
                   {headings.find((col) => col.label === "actions" && col.show) && (
                     <Table.Cell>
-                      <Link
-                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
-                        to={`/reservations/edit/${item.id}`}
-                      >
-                        Edit
-                      </Link>
-                      <DeletionModal
-                        queryKey={"rooms"}
-                        targetName={item.name}
-                        mutationFuntion={async () => await deleteRoom(item.id)}
-                      />
+                      {!(item.status === "confirmed" && isAfter(new Date(), new Date(item.end_date))) && (
+                        <Link
+                          className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
+                          to={`/reservations/edit/${item.id}`}
+                        >
+                          Edit
+                        </Link>
+                      )}
+
+                      {/* PREVENT DELETING FOR BOTH (ACUTAL & CONFIRMED) AND ALSO (FUTUR COMING) RESERVATIONS  */}
+                      {(!(
+                        item.status === "confirmed" &&
+                        isAfter(new Date(item.start_date), new Date()) &&
+                        isBefore(new Date(item.end_date), new Date())
+                      ) ||
+                        (item.status === "confirmed" && item.isAfter(new Date(item.start_date), new Date()))) && (
+                        <DeletionModal
+                          queryKey={"reservations"}
+                          targetName={"The reservation"}
+                          mutationFuntion={async () => await deleteReservation(item.id, !!item.deleted_at)}
+                        />
+                      )}
                     </Table.Cell>
                   )}
                 </Table.Row>

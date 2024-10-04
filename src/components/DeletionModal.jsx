@@ -10,8 +10,12 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
     mutationFn: mutationFuntion,
     onSuccess: () => {
       queryClient.invalidateQueries([queryKey]);
-      closeRef.click();
+      closeRef.current.click();
       toast.success(`${targetName} has been deleted!`);
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.error(`Error occured!`);
     },
   });
   return (

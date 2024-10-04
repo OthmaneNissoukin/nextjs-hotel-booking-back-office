@@ -64,14 +64,19 @@ export async function createNewReservation(
   return reservations;
 }
 
-export async function deleteReservation(id) {
-  const { data: reservations, error } = await supabase
-    .from("reservations")
-    .update({ deleted_at: formatISO9075(new Date()) })
-    .eq("id", id);
-
-  console.log("datetime", formatISO9075(new Date()));
-  return reservations;
+export async function deleteReservation(id, isDeletedByAdmin) {
+  // FOR DELETION IM USING SOFT DELETE
+  // ACTUAL DELETE WILL ONLY HAPPEN IN CASE IF THE CLIENT HAS ALREADY DELETED RESERVATION FROM HIS HISTORY
+  if (isDeletedByAdmin) {
+    const { error, data: reservations } = await supabase.from("reservations").delete().eq("id", id).select();
+    return reservations;
+  } else {
+    const { data: reservations, error } = await supabase
+      .from("reservations")
+      .update({ admin_deleted_at: formatISO9075(new Date()) })
+      .eq("id", id);
+    return reservations;
+  }
 }
 
 export async function getReservationByID(id) {
@@ -88,6 +93,7 @@ export async function getAllReservation() {
   let { data: reservations, error } = await supabase
     .from("reservations")
     .select("*, rooms(thumbnail, name, capacity, price), guests(fullname, nationalID, email)")
+    .neq("admin_deleted_at", null)
     .order("id", { ascending: false });
 
   console.log(error);
