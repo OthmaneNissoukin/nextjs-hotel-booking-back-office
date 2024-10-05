@@ -32,6 +32,7 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route exact path="/" element={<Dashboard />} />
+          <Route exact path="/dashboard" element={<Dashboard />} />
           <Route exact path="/rooms" element={<Rooms />} />
           <Route exact path="/rooms/new" element={<NewRoom />} />
           <Route exact path="/rooms/edit/:id" element={<EditRoom />} />
@@ -42,7 +43,6 @@ function App() {
           <Route exact path="/reservations/new" element={<NewReservation />} />
           <Route exact path="/reservations/edit/:id" element={<EditReservation />} />
         </Route>
-        {/* <Route exact path="/" element={<Dashboard />} /> */}
       </Routes>
     </>
   );

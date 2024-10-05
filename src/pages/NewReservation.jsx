@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { createGuest, getAllGuests } from "../services/supabase/guests";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DatePicker from "react-flatpickr";
 import { useEffect, useRef, useState } from "react";
 import FormSelect from "../components/FormSelect";
@@ -16,6 +16,8 @@ function NewReservation() {
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [disabledDays, setDisabledDays] = useState([]);
   const ref = useRef(null);
+
+  const query = useQueryClient();
 
   useEffect(() => {
     if (!selectedRoom) return;
@@ -64,6 +66,7 @@ function NewReservation() {
       ),
     onSuccess: () => {
       reset();
+      query.invalidateQueries({ queryKey: ["reservations"] });
       navigate("/reservations");
     },
     onError: (err) => {
@@ -240,7 +243,7 @@ function NewReservation() {
                 mode: "range",
                 dateFormat: "d-m-Y",
                 disable: [...disabledDays],
-                minDate: new Date(),
+                // minDate: new Date(),
               }}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             />

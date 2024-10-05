@@ -93,7 +93,7 @@ export async function getAllReservation() {
   let { data: reservations, error } = await supabase
     .from("reservations")
     .select("*, rooms(thumbnail, name, capacity, price), guests(fullname, nationalID, email)")
-    .neq("admin_deleted_at", null)
+    .is("admin_deleted_at", null)
     .order("id", { ascending: false });
 
   console.log(error);
