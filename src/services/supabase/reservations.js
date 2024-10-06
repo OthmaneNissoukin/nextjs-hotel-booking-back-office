@@ -41,6 +41,7 @@ export async function createNewReservation(
   reserved_price,
   start_date,
   end_date,
+  guest_fullname,
   status
 ) {
   const { data: reservations, error } = await supabase
@@ -54,6 +55,7 @@ export async function createNewReservation(
         message,
         start_date,
         end_date,
+        guest_fullname,
         status,
       },
     ])

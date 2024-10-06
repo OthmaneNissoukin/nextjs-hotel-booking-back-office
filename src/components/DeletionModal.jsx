@@ -7,7 +7,7 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
   const closeRef = useRef(null);
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: mutationFuntion,
+    mutationFn: async () => await mutationFuntion(),
     onSuccess: () => {
       queryClient.invalidateQueries([queryKey]);
       closeRef.current.click();

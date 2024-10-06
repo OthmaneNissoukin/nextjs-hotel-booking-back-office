@@ -1,29 +1,30 @@
+import { format, isToday, isYesterday } from "date-fns";
 import React from "react";
 
-function DashboardCard12({ guests, reservations, rooms }) {
-  console.log(guests);
-  const determineActionType = (item) => {
-    if (item.admin_deleted_at) return "delete";
-    if (item.updated_at) return "update";
-    return "create";
-  };
+function DashboardCard12({ logs }) {
+  // const groupedActivities = Object.groupBy(logs, ({created_at}) => isToday(created_at) ? "Today" : isYesterday(created_at) ? "Yesterday" : format(created_at, "dd-MM-yyyy"))
 
-  // Merge arrays and add the action_type field
-  const mergedArray = [...guests, ...reservations, ...rooms].map((item) => ({
-    ...item,
-    action_type: determineActionType(item),
-  }));
+  let mostRecentActivities = [];
+  let counter = 0;
+  logs.forEach((activity) => {
+    mostRecentActivities = [
+      ...mostRecentActivities,
+      {
+        ...activity,
+        created_at: isToday(activity.created_at)
+          ? "Today"
+          : isYesterday(activity.created_at)
+          ? "Yesterday"
+          : format(activity.created_at, "dd-MM-yyyy"),
+      },
+    ];
 
-  // Sort by the most relevant date (delete, update, or create)
-  const sortedActivities = mergedArray.sort((a, b) => {
-    const dateA = a.admin_deleted_at || a.deleted_at || a.updated_at || a.created_at;
-    const dateB = b.admin_deleted_at || a.deleted_at || b.updated_at || b.created_at;
-    return new Date(dateB) - new Date(dateA); // Sort by descending order (most recent first)
+    counter++;
+
+    if (counter >= 5) return;
   });
 
-  // ONLY GET 5 RECENT ACTIVITIES
-  sortedActivities.length = 5;
-  console.log(sortedActivities);
+  console.log(mostRecentActivities);
 
   return (
     <div className="col-span-full xl:col-span-6 bg-white dark:bg-gray-800 shadow-sm rounded-xl">
@@ -36,7 +37,7 @@ function DashboardCard12({ guests, reservations, rooms }) {
         <div>
           <ul className="my-1">
             {/* Item */}
-            {sortedActivities.map((item) => (
+            {logs.map((item) => (
               <li className="flex px-2">
                 <div className="w-9 h-9 rounded-full shrink-0 bg-violet-500 my-2 mr-3">
                   <svg className="w-9 h-9 fill-current text-white" viewBox="0 0 36 36">
@@ -44,7 +45,7 @@ function DashboardCard12({ guests, reservations, rooms }) {
                   </svg>
                 </div>
 
-                <p>{item.action_type}</p>
+                <p>{item.description}</p>
               </li>
             ))}
           </ul>

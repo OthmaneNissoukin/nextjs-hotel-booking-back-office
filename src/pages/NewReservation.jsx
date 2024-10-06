@@ -62,6 +62,7 @@ function NewReservation() {
         data.price,
         data.booking_period.at(0),
         data.booking_period.at(1),
+        guests.find((item) => item.id === selectedGuest).fullname,
         data.status
       ),
     onSuccess: () => {

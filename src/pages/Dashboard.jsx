@@ -22,6 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllReservation } from "../services/supabase/reservations";
 import { eachDayOfInterval, format, subDays } from "date-fns";
 import { getAllGuests } from "../services/supabase/guests";
+import { getRecentActivities } from "../services/supabase/logs";
 // import { getAllReservation } from "../services/supabase/reservations";
 // import { getStats } from "../services/supabase/stats";
 
@@ -37,11 +38,11 @@ function Dashboard() {
   } = useQuery({ queryKey: ["reservations"], queryFn: async () => await getAllReservation() });
 
   const {
-    data: rooms,
-    isLoading: isLoadingRooms,
-    isError: isErrorRooms,
-    error: errorRooms,
-  } = useQuery({ queryKey: ["rooms"], queryFn: async () => await getAllReservation() });
+    data: logs,
+    isLoading: isLoadingLogs,
+    isError: isErrorLogs,
+    error: errorLogs,
+  } = useQuery({ queryKey: ["logs"], queryFn: async () => await getRecentActivities(5) });
 
   const {
     data: guests,
@@ -50,14 +51,14 @@ function Dashboard() {
     error: errorGuests,
   } = useQuery({ queryKey: ["guests"], queryFn: async () => await getAllGuests() });
 
-  if (isLoading || isLoadingGuests || isLoadingRooms) return <h1>Wait...</h1>;
-  if (isError || isErrorGuests || isErrorRooms)
+  if (isLoading || isLoadingGuests || isLoadingLogs) return <h1>Wait...</h1>;
+  if (isError || isErrorGuests || isErrorLogs)
     return (
       <h1>
-        {error?.message} - {errorGuests?.message} - {errorRooms?.message}
+        {error?.message} - {errorGuests?.message}
       </h1>
     );
-  if (!reservations || !guests || !rooms) return <h1>No data was fetched. Please check your network</h1>;
+  if (!reservations || !guests || !logs) return <h1>No data was fetched. Please check your network</h1>;
 
   // console.log(reservations);
 
@@ -140,7 +141,7 @@ function Dashboard() {
             {/* <DashboardCard09 /> */}
 
             {/* Card (Recent Activity) */}
-            <DashboardCard12 rooms={rooms} guests={guests} reservations={reservations} />
+            <DashboardCard12 logs={logs} />
             {/* <DashboardCard12 /> */}
             {/* Card (Income/Expenses) */}
             {/* <DashboardCard13 /> */}

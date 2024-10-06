@@ -52,7 +52,8 @@ function Reservations() {
         item.guests?.nationalID.toLowerCase().includes(str) ||
         item.guests?.fullname.toLowerCase().includes(str) ||
         item.guests?.email.toLowerCase().includes(str) ||
-        item.rooms?.name.toLowerCase().includes(str)
+        item.rooms?.name.toLowerCase().includes(str) ||
+        item.guest_fullname?.toLowerCase().includes(str)
     );
 
     setFilteredReservations(tempReservations);

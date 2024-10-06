@@ -25,7 +25,10 @@ function ReservationsTable({ reservations, headings }) {
                   )}
 
                   {headings.find((col) => col.label === "guest" && col.show) && (
-                    <Table.Cell>{String(item.guests?.fullname)}</Table.Cell>
+                    <Table.Cell>
+                      {String(item.guests?.fullname ? item.guests?.fullname : item?.guest_fullname)}
+                      {!item.guest_id && <span className="text-xs text-red-800 italic">left</span>}
+                    </Table.Cell>
                   )}
                   {headings.find((col) => col.label === "price" && col.show) && (
                     <Table.Cell>${item.reserved_price.toFixed(2)}</Table.Cell>
@@ -39,14 +42,15 @@ function ReservationsTable({ reservations, headings }) {
                   {headings.find((col) => col.label === "status" && col.show) && <Table.Cell>{item.status}</Table.Cell>}
                   {headings.find((col) => col.label === "actions" && col.show) && (
                     <Table.Cell>
-                      {!(item.status === "confirmed" && isAfter(new Date(), new Date(item.end_date))) && (
-                        <Link
-                          className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
-                          to={`/reservations/edit/${item.id}`}
-                        >
-                          Edit
-                        </Link>
-                      )}
+                      {!(item.status === "confirmed" && isAfter(new Date(), new Date(item.end_date))) &&
+                        item.guest_id && (
+                          <Link
+                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
+                            to={`/reservations/edit/${item.id}`}
+                          >
+                            Edit
+                          </Link>
+                        )}
 
                       {/* PREVENT DELETING FOR BOTH (ACUTAL & CONFIRMED) AND ALSO (FUTUR COMING) RESERVATIONS  */}
                       {(!(
