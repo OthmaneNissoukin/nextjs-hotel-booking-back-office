@@ -37,20 +37,27 @@ function Dashboard() {
   } = useQuery({ queryKey: ["reservations"], queryFn: async () => await getAllReservation() });
 
   const {
+    data: rooms,
+    isLoading: isLoadingRooms,
+    isError: isErrorRooms,
+    error: errorRooms,
+  } = useQuery({ queryKey: ["rooms"], queryFn: async () => await getAllReservation() });
+
+  const {
     data: guests,
     isLoading: isLoadingGuests,
     isError: isErrorGuests,
     error: errorGuests,
   } = useQuery({ queryKey: ["guests"], queryFn: async () => await getAllGuests() });
 
-  if (isLoading || isLoadingGuests) return <h1>Wait...</h1>;
-  if (isError || isErrorGuests)
+  if (isLoading || isLoadingGuests || isLoadingRooms) return <h1>Wait...</h1>;
+  if (isError || isErrorGuests || isErrorRooms)
     return (
       <h1>
-        {error?.message} - {errorGuests}
+        {error?.message} - {errorGuests?.message} - {errorRooms?.message}
       </h1>
     );
-  if (!reservations || !guests) return <h1>No data was fetched. Please check your network</h1>;
+  if (!reservations || !guests || !rooms) return <h1>No data was fetched. Please check your network</h1>;
 
   // console.log(reservations);
 
@@ -73,6 +80,9 @@ function Dashboard() {
   const groupedReservations = Object.groupBy(confirmedReservations, ({ created_at }) =>
     format(created_at, "MM-dd-yyyy")
   );
+
+  const cancelledReservations = reservations.filter((item) => item.status === "cancelled");
+  const groupedReservationsByCancelReason = Object.groupBy(cancelledReservations, ({ cancel_reason }) => cancel_reason);
 
   return (
     <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -114,7 +124,10 @@ function Dashboard() {
             {/* Line chart (Real Time Value) */}
             {/* <DashboardCard11 /> */}
             {/* Card (Reasons for Refunds) */}
-            <DashboardCard11 />
+            <DashboardCard11
+              groupedCancelledReservations={groupedReservationsByCancelReason}
+              total={cancelledReservations.length}
+            />
             {/* Doughnut chart (Top Countries) */}
             <DashboardCard06 guests={guests} />
             {/* Card (Customers) */}
@@ -127,8 +140,8 @@ function Dashboard() {
             {/* <DashboardCard09 /> */}
 
             {/* Card (Recent Activity) */}
-            <DashboardCard12 />
-            <DashboardCard12 />
+            <DashboardCard12 rooms={rooms} guests={guests} reservations={reservations} />
+            {/* <DashboardCard12 /> */}
             {/* Card (Income/Expenses) */}
             {/* <DashboardCard13 /> */}
           </div>

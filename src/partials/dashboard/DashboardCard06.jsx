@@ -20,8 +20,6 @@ function DashboardCard06({ guests }) {
   countries.length = 5;
   countries = countries.filter(Boolean);
 
-  console.log(countries);
-
   const chartData = {
     labels: countries.map((item) => item),
     datasets: [
