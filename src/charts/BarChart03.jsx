@@ -24,6 +24,8 @@ function BarChart03({ data, width, height }) {
     const values = data.datasets.map((x) => x.data.reduce(reducer));
     const max = values.reduce(reducer);
 
+    console.log(values);
+
     const ctx = canvas.current;
     // eslint-disable-next-line no-unused-vars
     const newChart = new Chart(ctx, {
