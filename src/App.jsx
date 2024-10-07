@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
 import "./css/style.css";
@@ -17,6 +17,9 @@ import EditRoom from "./pages/EditRoom";
 import NewReservation from "./pages/NewReservation";
 import Reservations from "./pages/Reservations";
 import EditReservation from "./pages/EditReservation";
+import supabase from "./services/supabase/db";
+import { Auth } from "@supabase/auth-ui-react";
+import Login from "./pages/Login";
 
 function App() {
   const location = useLocation();
@@ -26,6 +29,27 @@ function App() {
     window.scroll({ top: 0 });
     document.querySelector("html").style.scrollBehavior = "";
   }, [location.pathname]); // triggered on route change
+
+  // SUPABASE AUTHENTICATION
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (!session) {
+    return <Login />;
+  }
 
   return (
     <>
