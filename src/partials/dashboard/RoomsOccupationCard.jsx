@@ -6,10 +6,49 @@ import EditMenu from "../../components/DropdownEditMenu";
 
 // Import utilities
 import { tailwindConfig, hexToRGB } from "../../utils/Utils";
+import { eachDayOfInterval, format, isAfter, isBefore, isEqual, parse, subDays } from "date-fns";
 
-function DashboardCard03({ dateRange, groupedReservations }) {
-  const stats = dateRange.map((item) => (groupedReservations[item] ? groupedReservations[item].length : 0));
-  const total = stats.reduce((curr, next) => curr + next, 0);
+function RoomsOccupationCard({ groupedReservations, dateRange }) {
+  let dateRangeObj = dateRange.reduce((acc, key) => {
+    acc[key] = null;
+    return acc;
+  }, {});
+
+  // THIS IS AN OBJECT WITH KEYS AS [RESERVATION DATE] AND VALUES AS [AN ARRAY OF ALL RESERVATIONS MADE WITHIN THAT DAY]
+  const reservationsByDates = Object.values(groupedReservations);
+
+  const filteredReservations = [];
+  // EXTRACTING RESERVATIONS OBJECTS FROM RESERVATION PERIODS ARRAY
+  reservationsByDates.forEach((element) => {
+    element.forEach((item) => filteredReservations.push(item));
+  });
+
+  filteredReservations.forEach((reservation) => {
+    // CREATING AN ARRAY FOR THE LASTEST 30 DAYS DAY BY DAY
+    const booking_period = eachDayOfInterval({
+      start: subDays(new Date(), 30),
+      end: new Date(),
+    }).map((date) => format(date, "yyyy-MM-dd"));
+
+    // ITERATING OVER EACH DAY AND CHECKING IF THAT DAY HAS ANY RUNNING CONFIRMED RESERVATION
+    booking_period.forEach((date) => {
+      if (
+        (isAfter(new Date(date), new Date(reservation.start_date)) &&
+          isBefore(new Date(date), new Date(reservation.end_date))) ||
+        isEqual(new Date(date), new Date(reservation.start_date)) ||
+        isEqual(new Date(date), new Date(reservation.end_date))
+      ) {
+        const [y, m, d] = date.split("-");
+        dateRangeObj[`${m}-${d}-${y}`] = dateRangeObj[`${m}-${d}-${y}`]
+          ? dateRangeObj[`${m}-${d}-${y}`] + reservation.guests_count
+          : reservation.guests_count;
+      }
+    });
+  });
+
+  const stats = Object.values(dateRangeObj).map((item) => (item ? item : 0));
+
+  const guestsAverage = Math.ceil(stats.reduce((curr, next) => curr + next, 0) / stats.length);
 
   const chartData = {
     labels: dateRange,
@@ -44,7 +83,7 @@ function DashboardCard03({ dateRange, groupedReservations }) {
     <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-white dark:bg-gray-800 shadow-sm rounded-xl">
       <div className="px-5 pt-5">
         <header className="flex justify-between items-start mb-2">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Reservations</h2>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Occupancy Rate</h2>
           {/* Menu button */}
           <EditMenu align="right" className="relative inline-flex">
             <li>
@@ -70,14 +109,14 @@ function DashboardCard03({ dateRange, groupedReservations }) {
             </li>
           </EditMenu>
         </header>
-        <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Booking</div>
+        <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Average</div>
         <div className="flex items-start">
-          <div className="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-2">{total} bookings</div>
-          <div className="text-sm font-medium text-green-700 px-1.5 bg-green-500/20 rounded-full">+49%</div>
+          <div className="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-2">{guestsAverage} Guests</div>
+          <div className="text-sm font-medium text-red-700 px-1.5 bg-red-500/20 rounded-full">-14%</div>
         </div>
       </div>
       {/* Chart built with Chart.js 3 */}
-      <div className="grow max-sm:max-h-[128px] xl:max-h-[128px]">
+      <div className="grow max-sm:max-h-[128px] max-h-[128px]">
         {/* Change the height attribute to adjust the chart height */}
         <LineChart data={chartData} width={389} height={128} shouldFormat={false} />
       </div>
@@ -85,4 +124,4 @@ function DashboardCard03({ dateRange, groupedReservations }) {
   );
 }
 
-export default DashboardCard03;
+export default RoomsOccupationCard;

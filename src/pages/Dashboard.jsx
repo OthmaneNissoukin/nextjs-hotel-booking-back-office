@@ -1,34 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 
-import Sidebar from "../partials/Sidebar";
-import Header from "../partials/Header";
 import FilterButton from "../components/DropdownFilter";
 import Datepicker from "../components/Datepicker";
 import LastThirtyDaysReservations from "../partials/dashboard/LastThirtyDaysReservations";
-import DashboardCard02 from "../partials/dashboard/DashboardCard02";
-import DashboardCard03 from "../partials/dashboard/DashboardCard03";
-import DashboardCard04 from "../partials/dashboard/DashboardCard04";
-import DashboardCard05 from "../partials/dashboard/DashboardCard05";
-import DashboardCard06 from "../partials/dashboard/DashboardCard06";
-import DashboardCard07 from "../partials/dashboard/DashboardCard07";
-import DashboardCard08 from "../partials/dashboard/DashboardCard08";
-import DashboardCard09 from "../partials/dashboard/DashboardCard09";
-import DashboardCard10 from "../partials/dashboard/DashboardCard10";
-import DashboardCard11 from "../partials/dashboard/DashboardCard11";
-import DashboardCard12 from "../partials/dashboard/DashboardCard12";
-import DashboardCard13 from "../partials/dashboard/DashboardCard13";
-import Banner from "../partials/Banner";
+
 import { useQuery } from "@tanstack/react-query";
 import { getAllReservation } from "../services/supabase/reservations";
 import { eachDayOfInterval, format, subDays } from "date-fns";
 import { getAllGuests } from "../services/supabase/guests";
 import { getRecentActivities } from "../services/supabase/logs";
-// import { getAllReservation } from "../services/supabase/reservations";
-// import { getStats } from "../services/supabase/stats";
+import InboxCard from "../partials/dashboard/InboxCard";
+import LogsCard from "../partials/dashboard/LogsCard";
+import TopCountriesCard from "../partials/dashboard/TopCountriesCard";
+import CancelReasonsCard from "../partials/dashboard/CancelReasonsCard";
+import RecentReservations from "../partials/dashboard/RecentReservations";
+import RoomsOccupationCard from "../partials/dashboard/RoomsOccupationCard";
 
 function Dashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const {
     data: reservations,
     isLoading,
@@ -62,9 +50,11 @@ function Dashboard() {
 
   // console.log(reservations);
 
-  const confirmedReservations = reservations
-    .filter((item) => item.status === "confirmed")
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const confirmedReservations = reservations.filter((item) => item.status === "confirmed");
+
+  confirmedReservations.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  console.log(confirmedReservations);
 
   // console.log("CONFIRMED RESERVATION");
   // console.log(confirmedReservations);
@@ -114,37 +104,16 @@ function Dashboard() {
 
           {/* Cards */}
           <div className="grid grid-cols-12 gap-6">
-            {/* Line chart (Acme Plus) */}
             <LastThirtyDaysReservations groupedReservations={groupedReservations} dateRange={dateRange} />
-            {/* Line chart (Acme Advanced) */}
-            <DashboardCard02 groupedReservations={groupedReservations} dateRange={dateRange} />
-            {/* Line chart (Acme Professional) */}
-            <DashboardCard03 groupedReservations={groupedReservations} dateRange={dateRange} />
-            {/* Bar chart (Direct vs Indirect) */}
-            {/* <DashboardCard04 /> */}
-            {/* Line chart (Real Time Value) */}
-            {/* <DashboardCard11 /> */}
-            {/* Card (Reasons for Refunds) */}
-            <DashboardCard11
+            <RoomsOccupationCard groupedReservations={groupedReservations} dateRange={dateRange} />
+            <RecentReservations groupedReservations={groupedReservations} dateRange={dateRange} />
+            <CancelReasonsCard
               groupedCancelledReservations={groupedReservationsByCancelReason}
               total={cancelledReservations.length}
             />
-            {/* Doughnut chart (Top Countries) */}
-            <DashboardCard06 guests={guests} />
-            {/* Card (Customers) */}
-            {/* <DashboardCard10 /> */}
-            {/* Table (Top Channels) */}
-            {/* <DashboardCard07 /> */}
-            {/* Line chart (Sales Over Time) */}
-            {/* <DashboardCard08 /> */}
-            {/* Stacked bar chart (Sales VS Refunds) */}
-            {/* <DashboardCard09 /> */}
-
-            {/* Card (Recent Activity) */}
-            <DashboardCard12 logs={logs} />
-            {/* <DashboardCard12 /> */}
-            {/* Card (Income/Expenses) */}
-            {/* <DashboardCard13 /> */}
+            <TopCountriesCard guests={guests} />
+            <LogsCard logs={logs} />
+            <InboxCard />
           </div>
         </div>
       </main>

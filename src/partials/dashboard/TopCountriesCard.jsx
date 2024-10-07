@@ -4,7 +4,7 @@ import DoughnutChart from "../../charts/DoughnutChart";
 // Import utilities
 import { tailwindConfig } from "../../utils/Utils";
 
-function DashboardCard06({ guests }) {
+function TopCountriesCard({ guests }) {
   const groupedGuests = Object.groupBy(guests, ({ nationality }) => nationality);
 
   let countries = Object.keys(groupedGuests).reduce((curr, next) => {
@@ -57,4 +57,4 @@ function DashboardCard06({ guests }) {
   );
 }
 
-export default DashboardCard06;
+export default TopCountriesCard;

@@ -11,7 +11,7 @@ export async function getAllActivities() {
 }
 
 export async function getRecentActivities(count = 10) {
-  let { data: logs, error } = await supabase.from("logs").select("*").limit(count);
+  let { data: logs, error } = await supabase.from("logs").select("*").order("id", { ascending: false }).limit(count);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 

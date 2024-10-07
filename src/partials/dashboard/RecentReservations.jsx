@@ -7,26 +7,17 @@ import EditMenu from "../../components/DropdownEditMenu";
 // Import utilities
 import { tailwindConfig, hexToRGB } from "../../utils/Utils";
 
-function LastThirtyDaysReservations({ groupedReservations = [], dateRange = [] }) {
-  const stats = dateRange.map((item) =>
-    groupedReservations[item]
-      ? groupedReservations[item].reduce(
-          (curr, next) => curr + parseFloat(next.reserved_price) * parseFloat(next.guests_count),
-          0
-        )
-      : 0
-  );
+function RecentReservations({ dateRange, groupedReservations }) {
+  const stats = dateRange.map((item) => (groupedReservations[item] ? groupedReservations[item].length : 0));
+  const total = stats.reduce((curr, next) => curr + next, 0);
 
-  const total = stats.reduce((curr, next) => curr + next, 0).toFixed(2);
   const chartData = {
     labels: dateRange,
-
     datasets: [
       // Indigo line
       {
         data: stats,
         fill: true,
-
         backgroundColor: function (context) {
           const chart = context.chart;
           const { ctx, chartArea } = chart;
@@ -53,7 +44,7 @@ function LastThirtyDaysReservations({ groupedReservations = [], dateRange = [] }
     <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-4 bg-white dark:bg-gray-800 shadow-sm rounded-xl">
       <div className="px-5 pt-5">
         <header className="flex justify-between items-start mb-2">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Last 30 days income</h2>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Reservations Activity</h2>
           {/* Menu button */}
           <EditMenu align="right" className="relative inline-flex">
             <li>
@@ -79,19 +70,19 @@ function LastThirtyDaysReservations({ groupedReservations = [], dateRange = [] }
             </li>
           </EditMenu>
         </header>
-        <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Sales</div>
+        <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Booking</div>
         <div className="flex items-start">
-          <div className="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-2">${total}</div>
+          <div className="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-2">{total} bookings</div>
           <div className="text-sm font-medium text-green-700 px-1.5 bg-green-500/20 rounded-full">+49%</div>
         </div>
       </div>
       {/* Chart built with Chart.js 3 */}
       <div className="grow max-sm:max-h-[128px] xl:max-h-[128px]">
         {/* Change the height attribute to adjust the chart height */}
-        <LineChart data={chartData} width={389} height={128} />
+        <LineChart data={chartData} width={389} height={128} shouldFormat={false} />
       </div>
     </div>
   );
 }
 
-export default LastThirtyDaysReservations;
+export default RecentReservations;

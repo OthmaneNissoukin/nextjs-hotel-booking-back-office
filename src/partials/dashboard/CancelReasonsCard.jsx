@@ -4,7 +4,7 @@ import BarChart from "../../charts/BarChart03";
 // Import utilities
 import { tailwindConfig } from "../../utils/Utils";
 
-function DashboardCard11({ groupedCancelledReservations, total }) {
+function CancelReasonsCard({ groupedCancelledReservations, total }) {
   const reasonsLabels = Object.keys(groupedCancelledReservations);
 
   let reasons = reasonsLabels.reduce((curr, next) => {
@@ -86,4 +86,4 @@ function DashboardCard11({ groupedCancelledReservations, total }) {
   );
 }
 
-export default DashboardCard11;
+export default CancelReasonsCard;
