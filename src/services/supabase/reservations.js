@@ -91,17 +91,16 @@ export async function getReservationByID(id) {
   return reservations;
 }
 
-export async function getAllReservation(from = 0, to = 5) {
-  let {
-    data: reservations,
-    error,
-    count,
-  } = await supabase
+export async function getAllReservation(from, to) {
+  let query = supabase
     .from("reservations")
     .select("*, rooms(thumbnail, name, capacity, price), guests(fullname, nationalID, email)", { count: "exact" })
     .is("admin_deleted_at", null)
-    .order("id", { ascending: false })
-    .range(from, to);
+    .order("id", { ascending: false });
+
+  if (from && to) query.range(from, to);
+
+  const { data: reservations, error, count } = await query;
 
   console.log(error);
 

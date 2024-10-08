@@ -1,13 +1,15 @@
 import supabase from "./db";
 
-export async function getAllMessages(from = 0, to = 5) {
-  let {
-    data: messages,
-    count,
-    error,
-  } = await supabase.from("inbox").select("*", { count: "exact" }).order("id", { ascending: false }).range(from, to);
+export async function getAllMessages(from, to, limit) {
+  let query = supabase.from("inbox").select("*", { count: "exact" }).order("id", { ascending: false });
+
+  if (limit) query.limit(limit);
+
+  if (from && to) query.range(from, to);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  const { data: messages, count, error } = await query;
 
   if (error) console.log(error);
 

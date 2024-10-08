@@ -3,6 +3,9 @@ import BarChart from "../../charts/BarChart03";
 
 // Import utilities
 import { tailwindConfig } from "../../utils/Utils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFolderBlank } from "@fortawesome/free-regular-svg-icons";
+import CardEmptyState from "../../components/CardEmptyState";
 
 function CancelReasonsCard({ groupedCancelledReservations, total }) {
   const reasonsLabels = Object.keys(groupedCancelledReservations);
@@ -72,7 +75,9 @@ function CancelReasonsCard({ groupedCancelledReservations, total }) {
         <h2 className="font-semibold text-gray-800 dark:text-gray-100">Reasons for Cancel</h2>
       </header>
 
-      {Object.values(reasons).reduce((curr, next) => curr + next, 0) > 0 ? (
+      {!reasons.length ? (
+        <CardEmptyState>No cancel was performed</CardEmptyState>
+      ) : Object.values(reasons).reduce((curr, next) => curr + next, 0) > 0 ? (
         <>
           {" "}
           <div className="px-5 py-3">

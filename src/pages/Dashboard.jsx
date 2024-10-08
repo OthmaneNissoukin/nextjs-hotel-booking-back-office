@@ -15,10 +15,11 @@ import TopCountriesCard from "../partials/dashboard/TopCountriesCard";
 import CancelReasonsCard from "../partials/dashboard/CancelReasonsCard";
 import RecentReservations from "../partials/dashboard/RecentReservations";
 import RoomsOccupationCard from "../partials/dashboard/RoomsOccupationCard";
+import { getAllMessages } from "../services/supabase/inbox";
 
 function Dashboard() {
   const {
-    data: reservations,
+    data: { reservations } = {},
     isLoading,
     isError,
     error,
@@ -33,17 +34,24 @@ function Dashboard() {
   } = useQuery({ queryKey: ["logs"], queryFn: async () => await getRecentActivities(5) });
 
   const {
-    data: guests,
+    data: { messages } = {},
+    isLoading: isLoadingMessages,
+    isError: isErrorMessages,
+    error: errorMessages,
+  } = useQuery({ queryKey: ["messages"], queryFn: async () => await getAllMessages(null, null, 5) });
+
+  const {
+    data: { guests } = {},
     isLoading: isLoadingGuests,
     isError: isErrorGuests,
     error: errorGuests,
   } = useQuery({ queryKey: ["guests"], queryFn: async () => await getAllGuests() });
 
-  if (isLoading || isLoadingGuests || isLoadingLogs) return <h1>Wait...</h1>;
-  if (isError || isErrorGuests || isErrorLogs)
+  if (isLoading || isLoadingGuests || isLoadingLogs || isLoadingMessages) return <h1>Wait...</h1>;
+  if (isError || isErrorGuests || isErrorLogs || isErrorMessages)
     return (
       <h1>
-        {error?.message} - {errorGuests?.message}
+        {error?.message} - {errorGuests?.message} - {errorMessages?.message} - {errorLogs?.message}
       </h1>
     );
   if (!reservations || !guests || !logs) return <h1>No data was fetched. Please check your network</h1>;
@@ -113,7 +121,7 @@ function Dashboard() {
             />
             <TopCountriesCard guests={guests} />
             <LogsCard logs={logs} />
-            <InboxCard />
+            <InboxCard messages={messages} />
           </div>
         </div>
       </main>
