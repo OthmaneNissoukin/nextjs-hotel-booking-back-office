@@ -3,8 +3,11 @@ import Modal from "../components/Modal";
 import { useMutation } from "@tanstack/react-query";
 import { createRoom } from "../services/supabase/rooms";
 import toast, { Toaster } from "react-hot-toast";
+import { useThemeProvider } from "../utils/ThemeContext";
 
 function NewRoom() {
+  const { currentTheme, changeCurrentTheme } = useThemeProvider();
+
   const {
     register,
     handleSubmit,
@@ -170,6 +173,7 @@ function NewRoom() {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-y"
             {...register("description", { maxLength: 3000, minLength: 120, required: true })}
           ></textarea>
+
           {errors.description?.type === "minLength" && (
             <p className="text-sm text-red-700 italic">Description must contain at least 120 charcters</p>
           )}

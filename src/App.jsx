@@ -20,6 +20,8 @@ import EditReservation from "./pages/EditReservation";
 import supabase from "./services/supabase/db";
 import { Auth } from "@supabase/auth-ui-react";
 import Login from "./pages/Login";
+import Inbox from "./pages/Inbox";
+import Logs from "./pages/Logs";
 
 function App() {
   const location = useLocation();
@@ -66,6 +68,8 @@ function App() {
           <Route exact path="/reservations" element={<Reservations />} />
           <Route exact path="/reservations/new" element={<NewReservation />} />
           <Route exact path="/reservations/edit/:id" element={<EditReservation />} />
+          <Route exact path="/inbox" element={<Inbox />} />
+          <Route exact path="/activities" element={<Logs />} />
         </Route>
       </Routes>
     </>

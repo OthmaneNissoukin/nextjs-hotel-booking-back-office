@@ -1,78 +1,57 @@
 import { useState } from "react";
-import RoomsFilter from "../components/RoomsFilter";
-import RoomsTable from "../components/RoomsTable";
-import { getAllRooms } from "../services/supabase/rooms";
+
 import { useQuery } from "@tanstack/react-query";
 import SectionContainer from "../ui/SectionContainer";
-import NewRoom from "./NewRoom";
 import { Link } from "react-router-dom";
 import ColsControl from "../components/ColsControl";
-import { getAllReservation } from "../services/supabase/reservations";
-import ReservationsTable from "../components/ReservationsTable";
+import { getAllMessages } from "../services/supabase/inbox";
+import InboxTable from "../components/InboxTable";
 import FilterButton from "../components/DropdownFilter";
 
-const tableHeadings = ["#", "room", "guest", "price", "start date", "end date", "status", "actions"];
+const tableHeadings = ["#", "date", "fullname", "email", "phone", "message", "actions"];
 
-// const tempReservations = [
-//   {
-//     id: 1,
-//     name: "Deluxe 2",
-
-//     start_date: "24-09-2024",
-//     end_date: "30-09-2024",
-//     status: "Finished",
-//     reserved_price: 120,
-//     room: {
-//       name: "Deluxe Room 2",
-//     },
-//     guest: {
-//       fullname: "Othmane Nissoukin",
-//     },
-//   },
-// ];
-
-function Reservations() {
+function Inbox() {
   // const queryClient = useQueryClient();
-  const [filteredReservations, setFilteredReservations] = useState([]);
+  const [filteredMessages, setFilteredMessages] = useState([]);
   const [search, setSearch] = useState("");
   const {
-    data: reservations,
+    data: messages,
     isPending,
     error,
-  } = useQuery({ queryKey: ["reservations"], queryFn: async () => getAllReservation() });
+    isError,
+  } = useQuery({ queryKey: ["inbox"], queryFn: async () => getAllMessages() });
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
   function handleSearch(str) {
     setSearch(str);
     if (!str.trim() == "") {
-      setFilteredReservations(reservations);
+      setFilteredMessages(messages);
     }
 
-    const tempReservations = reservations.filter(
+    const tempMessages = messages.filter(
       (item) =>
-        item.guests?.nationalID.toLowerCase().includes(str) ||
-        item.guests?.fullname.toLowerCase().includes(str) ||
-        item.guests?.email.toLowerCase().includes(str) ||
-        item.rooms?.name.toLowerCase().includes(str) ||
-        item.guest_fullname?.toLowerCase().includes(str)
+        item.email.toLowerCase().includes(str) ||
+        item.fullname.toLowerCase().includes(str) ||
+        item.phone.toLowerCase().includes(str) ||
+        item.message.toLowerCase().includes(str)
     );
 
-    setFilteredReservations(tempReservations);
+    setFilteredMessages(tempMessages);
   }
 
   if (isPending) return <h1>Loading...</h1>;
 
-  if (error) return <h1>Error, Please check your network and try again</h1>;
+  if (isError) return <h1>{error.message}</h1>;
 
-  if (!reservations) return <h1>No reservation was found</h1>;
+  if (!messages) return <h1>No message was found</h1>;
 
   return (
-    <SectionContainer label={"Reservations"} description={"List of all the available reservations"}>
+    <SectionContainer label={"Messages"} description={"List of all the available messages"}>
       <div className="xs:flex xs:justify-between xs:items-center mb-5">
         <div>
           <input
             type="text"
-            placeholder="Search by room, guest, email, national id"
+            placeholder="Search by name, email, message"
             className="w-72 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             value={search}
             onChange={(e) => handleSearch(e.target.value.toLowerCase())}
@@ -90,9 +69,9 @@ function Reservations() {
           </Link>
         </div>
       </div>
-      <ReservationsTable reservations={search ? filteredReservations : reservations} headings={headings} />
+      <InboxTable messages={search ? filteredMessages : messages} headings={headings} />
     </SectionContainer>
   );
 }
 
-export default Reservations;
+export default Inbox;

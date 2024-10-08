@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Modal from "../components/Modal";
 import Checkbox from "../components/Checkbox";
 import ColsControl from "../components/ColsControl";
+import FilterButton from "../components/DropdownFilter";
 
 // const tableHeadings = ["#", "name", "nationalID", "email", "phone", "nationality", "actions"];
 const tableHeadings = ["#", "Fullname", "NationalID", "Email", "Phone", "Nationality", "Actions"];
@@ -87,7 +88,8 @@ function Guests() {
           />
         </div>
         <div className="flex gap-5">
-          <ColsControl headings={headings} setHeadings={setHeadings} />
+          {/* <ColsControl headings={headings} setHeadings={setHeadings} /> */}
+          <FilterButton headings={headings} setHeadings={setHeadings} align="right" />
 
           <Link
             to={"/guests/new"}
