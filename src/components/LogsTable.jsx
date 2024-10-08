@@ -4,7 +4,7 @@ import Table from "./Table/Table";
 import { format, isToday, isYesterday } from "date-fns";
 import { deleteActivity } from "../services/supabase/logs";
 
-function LogsTable({ logs, headings }) {
+function LogsTable({ indexStartingFrom, logs, headings }) {
   return (
     <div className="flex flex-col">
       <div className="-m-1.5 overflow-x-auto">
@@ -16,7 +16,7 @@ function LogsTable({ logs, headings }) {
               {logs?.map((item, index) => (
                 <Table.Row>
                   {headings.find((col) => col.label === "#" && col.show) && (
-                    <Table.Cell>{String(index + 1).padStart(3, "0")}</Table.Cell>
+                    <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
                   )}
 
                   {headings.find((col) => col.label === "date" && col.show) && (

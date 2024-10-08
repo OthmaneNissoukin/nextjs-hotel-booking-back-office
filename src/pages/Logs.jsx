@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import SectionContainer from "../ui/SectionContainer";
@@ -7,21 +7,33 @@ import { Link } from "react-router-dom";
 import FilterButton from "../components/DropdownFilter";
 import { getAllActivities } from "../services/supabase/logs";
 import LogsTable from "../components/LogsTable";
+import Pagination from "../components/Pagination";
 
 const tableHeadings = ["#", "date", "category", "description", "actions"];
 
 function Logs() {
   // const queryClient = useQueryClient();
+  const [page, setPage] = useState(0);
+
+  // PAGINATION IS 0 BASED INDEXED
+  const [paginationStep, setPaginationStep] = useState(5);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [search, setSearch] = useState("");
   const {
-    data: logs,
+    data: { count, logs } = {},
     isPending,
     error,
     isError,
-  } = useQuery({ queryKey: ["logs"], queryFn: async () => getAllActivities() });
+    // isPreviousData,
+  } = useQuery({
+    queryKey: ["logs", page],
+    // keepPreviousData: true,
+    // pagination - 1 is for indexing, pagination is 0 based index
+    queryFn: async () => getAllActivities(page * paginationStep, (page + 1) * paginationStep - 1),
+  });
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
-  console.log(logs);
+
+  // console.log(isPreviousData);
 
   function handleSearch(str) {
     setSearch(str);
@@ -64,7 +76,19 @@ function Logs() {
           </Link>
         </div>
       </div>
-      <LogsTable logs={search ? filteredActivities : logs} headings={headings} />
+      <LogsTable
+        indexStartingFrom={paginationStep * page + 1}
+        logs={search ? filteredActivities : logs}
+        headings={headings}
+      />
+
+      <Pagination
+        pageNumber={page}
+        totalCount={count}
+        currentDataCount={logs.length}
+        paginationStep={paginationStep}
+        setPage={setPage}
+      />
     </SectionContainer>
   );
 }

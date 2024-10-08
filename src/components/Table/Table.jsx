@@ -5,7 +5,7 @@ export default function Table({ children }) {
 function Head({ headings = [] }) {
   return (
     <thead>
-      <tr className="dark:bg-slate-800 bg-slate-200">
+      <tr className="dark:bg-slate-800 bg-slate-200 ">
         {headings.map(
           (col, index) =>
             col.show && (

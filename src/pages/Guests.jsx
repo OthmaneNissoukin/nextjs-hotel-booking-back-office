@@ -7,7 +7,9 @@ import { Link } from "react-router-dom";
 import Modal from "../components/Modal";
 import Checkbox from "../components/Checkbox";
 import ColsControl from "../components/ColsControl";
+import Pagination from "../components/Pagination";
 import FilterButton from "../components/DropdownFilter";
+import { PAGINATION_STEP } from "../utils/Utils";
 
 // const tableHeadings = ["#", "name", "nationalID", "email", "phone", "nationality", "actions"];
 const tableHeadings = ["#", "Fullname", "NationalID", "Email", "Phone", "Nationality", "Actions"];
@@ -44,9 +46,17 @@ const dummyGuests = [
 ];
 
 function Guests() {
-  // const queryClient = useQueryClient();
+  const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
-  const { data: guests, isLoading, error } = useQuery({ queryKey: ["guests"], queryFn: getAllGuests });
+  const {
+    data: { guests, count } = {},
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["guests", page],
+    queryFn: async () => await getAllGuests(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
+  });
 
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
@@ -70,7 +80,7 @@ function Guests() {
 
   if (isLoading) return <h1>Loading...</h1>;
 
-  if (error) return <h1>Error, Please check your network and try again</h1>;
+  if (isError) return <h1>{error.message}</h1>;
 
   if (!guests) return <h1>No guest was found. Please check your network</h1>;
 
@@ -100,6 +110,13 @@ function Guests() {
         </div>
       </div>
       <GuestsTable guests={tempGuests ?? guests} tableHeadings={headings} />
+      <Pagination
+        pageNumber={page}
+        setPage={setPage}
+        currentDataCount={guests.length}
+        totalCount={count}
+        paginationStep={PAGINATION_STEP}
+      />
     </SectionContainer>
   );
 }

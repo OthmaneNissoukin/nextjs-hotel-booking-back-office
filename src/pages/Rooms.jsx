@@ -9,13 +9,23 @@ import { Link } from "react-router-dom";
 import ColsControl from "../components/ColsControl";
 
 import FilterButton from "../components/DropdownFilter";
+import Pagination from "../components/Pagination";
+import { PAGINATION_STEP } from "../utils/Utils";
 
 const tableHeadings = ["#", "name", "capacity", "price", "discount", "status", "actions"];
 
 function Rooms() {
-  // const queryClient = useQueryClient();
+  const [page, setPage] = useState(0);
   const [filter, setFilter] = useState("");
-  const { data: rooms, isLoading, isError, error } = useQuery({ queryKey: ["rooms"], queryFn: getAllRooms });
+  const {
+    data: { rooms, count } = {},
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["rooms", page],
+    queryFn: async () => await getAllRooms(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP - 1),
+  });
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
   if (isLoading || error) return <h1>Loading...</h1>;
@@ -60,6 +70,13 @@ function Rooms() {
         </div>
       </div>
       <RoomsTable rooms={rooms} headings={headings} />
+      <Pagination
+        pageNumber={page}
+        setPage={setPage}
+        currentDataCount={rooms.length}
+        totalCount={count}
+        paginationStep={PAGINATION_STEP}
+      />
     </SectionContainer>
   );
 }

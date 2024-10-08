@@ -1,12 +1,19 @@
 import { generateSlug } from "../../utils/Utils";
 import supabase from "./db";
 
-export async function getAllRooms() {
-  let { data: rooms, error } = await supabase.from("rooms").select("*, reservations(id,start_date, end_date, status)");
+export async function getAllRooms(from = 0, to = 5) {
+  let {
+    data: rooms,
+    error,
+    count,
+  } = await supabase
+    .from("rooms")
+    .select("*, reservations(id,start_date, end_date, status)", { count: "exact" })
+    .range(from, to);
 
   // await new Promise((res) => setTimeout(res, 2000));
 
-  return rooms;
+  return { rooms, count };
 }
 
 export async function getRoomById(id) {

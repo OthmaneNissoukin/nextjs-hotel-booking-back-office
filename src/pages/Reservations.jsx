@@ -10,6 +10,8 @@ import ColsControl from "../components/ColsControl";
 import { getAllReservation } from "../services/supabase/reservations";
 import ReservationsTable from "../components/ReservationsTable";
 import FilterButton from "../components/DropdownFilter";
+import Pagination from "../components/Pagination";
+import { PAGINATION_STEP } from "../utils/Utils";
 
 const tableHeadings = ["#", "room", "guest", "price", "start date", "end date", "status", "actions"];
 
@@ -32,14 +34,17 @@ const tableHeadings = ["#", "room", "guest", "price", "start date", "end date", 
 // ];
 
 function Reservations() {
-  // const queryClient = useQueryClient();
+  const [page, setPage] = useState(0);
   const [filteredReservations, setFilteredReservations] = useState([]);
   const [search, setSearch] = useState("");
   const {
-    data: reservations,
+    data: { reservations, count } = {},
     isPending,
     error,
-  } = useQuery({ queryKey: ["reservations"], queryFn: async () => getAllReservation() });
+  } = useQuery({
+    queryKey: ["reservations", page],
+    queryFn: async () => getAllReservation(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
+  });
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
   function handleSearch(str) {
@@ -91,6 +96,13 @@ function Reservations() {
         </div>
       </div>
       <ReservationsTable reservations={search ? filteredReservations : reservations} headings={headings} />
+      <Pagination
+        pageNumber={page}
+        setPage={setPage}
+        currentDataCount={reservations.length}
+        totalCount={count}
+        paginationStep={PAGINATION_STEP}
+      />
     </SectionContainer>
   );
 }

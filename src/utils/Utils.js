@@ -48,3 +48,5 @@ export const formatCountry = (nationality) => {
 export const generateSlug = (str) => {
   return str.toLowerCase().split(" ").join("-");
 };
+
+export const PAGINATION_STEP = 5;

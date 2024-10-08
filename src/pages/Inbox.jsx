@@ -7,19 +7,24 @@ import ColsControl from "../components/ColsControl";
 import { getAllMessages } from "../services/supabase/inbox";
 import InboxTable from "../components/InboxTable";
 import FilterButton from "../components/DropdownFilter";
+import Pagination from "../components/Pagination";
+import { PAGINATION_STEP } from "../utils/Utils";
 
 const tableHeadings = ["#", "date", "fullname", "email", "phone", "message", "actions"];
 
 function Inbox() {
-  // const queryClient = useQueryClient();
+  const [page, setPage] = useState(0);
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [search, setSearch] = useState("");
   const {
-    data: messages,
+    data: { messages, count } = {},
     isPending,
     error,
     isError,
-  } = useQuery({ queryKey: ["inbox"], queryFn: async () => getAllMessages() });
+  } = useQuery({
+    queryKey: ["inbox", page],
+    queryFn: async () => getAllMessages(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
+  });
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
   function handleSearch(str) {
@@ -70,6 +75,13 @@ function Inbox() {
         </div>
       </div>
       <InboxTable messages={search ? filteredMessages : messages} headings={headings} />
+      <Pagination
+        pageNumber={page}
+        setPage={setPage}
+        currentDataCount={messages.length}
+        totalCount={count}
+        paginationStep={PAGINATION_STEP}
+      />
     </SectionContainer>
   );
 }

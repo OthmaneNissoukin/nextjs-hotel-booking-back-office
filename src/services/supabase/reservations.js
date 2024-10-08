@@ -91,16 +91,21 @@ export async function getReservationByID(id) {
   return reservations;
 }
 
-export async function getAllReservation() {
-  let { data: reservations, error } = await supabase
+export async function getAllReservation(from = 0, to = 5) {
+  let {
+    data: reservations,
+    error,
+    count,
+  } = await supabase
     .from("reservations")
-    .select("*, rooms(thumbnail, name, capacity, price), guests(fullname, nationalID, email)")
+    .select("*, rooms(thumbnail, name, capacity, price), guests(fullname, nationalID, email)", { count: "exact" })
     .is("admin_deleted_at", null)
-    .order("id", { ascending: false });
+    .order("id", { ascending: false })
+    .range(from, to);
 
   console.log(error);
 
-  return reservations;
+  return { reservations, count };
 }
 
 export async function updateReseration(id, room_id, price, guests_count, start_date, end_date, status) {

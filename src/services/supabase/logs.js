@@ -1,13 +1,17 @@
 import supabase from "./db";
 
-export async function getAllActivities() {
-  let { data: guests, error } = await supabase.from("logs").select("*").order("id", { ascending: false });
+export async function getAllActivities(from = 0, to = 5) {
+  let {
+    data: logs,
+    error,
+    count,
+  } = await supabase.from("logs").select("*", { count: "exact" }).order("id", { ascending: false }).range(from, to);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
   if (error) console.log(error);
 
-  return guests;
+  return { logs, count };
 }
 
 export async function getRecentActivities(count = 10) {

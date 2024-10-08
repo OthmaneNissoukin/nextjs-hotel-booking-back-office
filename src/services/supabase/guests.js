@@ -7,14 +7,14 @@ export async function getGuestById(id) {
 
   return guests;
 }
-export async function getAllGuests() {
-  let { data: guests, error } = await supabase.from("guests").select("*");
+export async function getAllGuests(from = 0, to = 5) {
+  let { data: guests, error, count } = await supabase.from("guests").select("*", { count: "exact" }).range(from, to);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
   if (error) console.log(error);
 
-  return guests;
+  return { guests, count };
 }
 
 export async function getGuestByEmail(email) {
