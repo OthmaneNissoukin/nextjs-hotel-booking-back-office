@@ -6,9 +6,10 @@ import DatePicker from "react-flatpickr";
 import { useEffect, useRef, useState } from "react";
 import FormSelect from "../components/FormSelect";
 import { getAllRooms } from "../services/supabase/rooms";
-import { format, areIntervalsOverlapping, isBefore, subDays, isAfter } from "date-fns";
+import { areIntervalsOverlapping, isBefore, subDays, isAfter } from "date-fns";
 import toast, { Toaster } from "react-hot-toast";
 import { getReservationByID, updateReseration } from "../services/supabase/reservations";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function EditReservation() {
   const { id: reservationID } = useParams();
@@ -56,8 +57,8 @@ function EditReservation() {
 
   const {
     data: reservation,
-    error: reservationError,
-    isFetching: isFetchingReservation,
+    isError: isReservationError,
+    isLoading: isLoadingReservation,
   } = useQuery({
     queryKey: ["editedReservation"],
     queryFn: async () => getReservationByID(reservationID),
@@ -65,9 +66,9 @@ function EditReservation() {
   });
 
   const {
-    data: rooms,
-    error: roomsError,
-    isFetchingRooms,
+    data: { rooms } = {},
+    isError: isRoomsError,
+    isLoading: isLoadingRooms,
     isSuccess,
   } = useQuery({ queryKey: ["rooms"], queryFn: async () => getAllRooms(), staleTime: 60 * 60 * 60 });
 
@@ -132,11 +133,13 @@ function EditReservation() {
     // setBookingPeriod(value);
   }
 
-  if (isFetchingReservation || isFetchingRooms) return <h1>Please wait...</h1>;
+  if (isLoadingReservation || isLoadingRooms) return <h1>Please wait...</h1>;
 
-  if (reservationError || roomsError) return <h1>Error occured!</h1>;
+  if (isReservationError || isRoomsError) return <h1>Error occured!</h1>;
 
   if (!reservation && !rooms) return <h1>Reservation not found!</h1>;
+
+  console.log(reservation);
 
   return (
     <div className="p-5">
@@ -308,11 +311,11 @@ function EditReservation() {
 
         <div className="mt-5 flex gap-5 justify-end">
           <button
-            className="px-8 py-2 bg-blue-700 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
+            className="px-8 py-2 bg-blue-700 min-w-32 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
             disabled={isPending}
             onClick={async () => await trigger("start_date")}
           >
-            {isPending ? "Submitting..." : "Save"}
+            {isPending ? <LoadingSpinner /> : "Save"}
           </button>
         </div>
       </form>

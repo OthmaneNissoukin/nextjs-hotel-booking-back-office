@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
-import { createGuest, getGuestById, updateGuest } from "../services/supabase/guests";
+import { getGuestById, updateGuest } from "../services/supabase/guests";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import SelectCountry from "../components/CountrySelector";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function EditGuest() {
   const { id } = useParams();
@@ -10,7 +12,7 @@ function EditGuest() {
   const {
     data: guest,
     error,
-    isFetching,
+    isLoading,
   } = useQuery({ queryKey: ["editedUser"], staleTime: 60 * 60 * 60, queryFn: async () => getGuestById(id) });
 
   const {
@@ -20,10 +22,14 @@ function EditGuest() {
     reset,
   } = useForm();
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending: isSubmitting } = useMutation({
     mutationFn: async (data) => await updateGuest(id, data),
     onSuccess: () => {
       query.invalidateQueries(["editedUser"]);
+      toast.success("Guest has been updated");
+    },
+    onError: (err) => {
+      toast.error("Failed to update guest");
     },
   });
 
@@ -36,7 +42,7 @@ function EditGuest() {
     mutate(data);
   }
 
-  if (isFetching) return "Loading Guest...";
+  if (isLoading) return "Loading Guest...";
   if (error) return "Error occured !!!";
 
   if (!guest) return "Guest not found!";
@@ -144,10 +150,10 @@ function EditGuest() {
 
         <div className="mt-5 flex gap-5 justify-end">
           <button
-            className="px-8 py-2 bg-blue-700 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
-            disabled={isPending}
+            className="px-8 py-2 bg-blue-700 min-w-32 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
+            disabled={isSubmitting}
           >
-            {isPending ? "Updating..." : "Save"}
+            {isSubmitting ? <LoadingSpinner /> : "Save"}
           </button>
         </div>
       </form>

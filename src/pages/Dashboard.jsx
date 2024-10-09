@@ -16,6 +16,8 @@ import CancelReasonsCard from "../partials/dashboard/CancelReasonsCard";
 import RecentReservations from "../partials/dashboard/RecentReservations";
 import RoomsOccupationCard from "../partials/dashboard/RoomsOccupationCard";
 import { getAllMessages } from "../services/supabase/inbox";
+import Loader from "../components/Loader";
+import DashboardSkeleton from "../components/DashboardSkeleton";
 
 function Dashboard() {
   const {
@@ -47,7 +49,7 @@ function Dashboard() {
     error: errorGuests,
   } = useQuery({ queryKey: ["guests"], queryFn: async () => await getAllGuests() });
 
-  if (isLoading || isLoadingGuests || isLoadingLogs || isLoadingMessages) return <h1>Wait...</h1>;
+  if (isLoading || isLoadingGuests || isLoadingLogs || isLoadingMessages) return <DashboardSkeleton />;
   if (isError || isErrorGuests || isErrorLogs || isErrorMessages)
     return (
       <h1>

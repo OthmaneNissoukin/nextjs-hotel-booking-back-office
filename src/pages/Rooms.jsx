@@ -1,57 +1,36 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import RoomsFilter from "../components/RoomsFilter";
 import RoomsTable from "../components/RoomsTable";
-import { getAllRooms } from "../services/supabase/rooms";
-import { useQuery } from "@tanstack/react-query";
 import SectionContainer from "../ui/SectionContainer";
-import NewRoom from "./NewRoom";
-import { Link } from "react-router-dom";
-import ColsControl from "../components/ColsControl";
 
 import FilterButton from "../components/DropdownFilter";
-import Pagination from "../components/Pagination";
-import { PAGINATION_STEP } from "../utils/Utils";
-
 const tableHeadings = ["#", "name", "capacity", "price", "discount", "status", "actions"];
 
 function Rooms() {
-  const [page, setPage] = useState(0);
   const [filter, setFilter] = useState("");
-  const {
-    data: { rooms, count } = {},
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["rooms", page],
-    queryFn: async () => await getAllRooms(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP - 1),
-  });
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
-
-  if (isLoading || error) return <h1>Loading...</h1>;
-
-  if (isError) return <h1>Error, Please check your network and try again</h1>;
 
   // if (!rooms) return <h1>No room was found</h1>;
 
-  let filteredRooms = rooms ? [...rooms] : [];
+  // let filteredRooms = rooms ? [...rooms] : [];
 
-  switch (filter) {
-    case "asc-capacity":
-      filteredRooms = filteredRooms?.sort((a, b) => a.capacity - b.capacity);
-      break;
-    case "desc-capacity":
-      filteredRooms = filteredRooms?.sort((a, b) => b.capacity - a.capacity);
-      break;
-    case "asc-price":
-      filteredRooms = filteredRooms?.sort((a, b) => a.price - b.price);
-      break;
-    case "desc-price":
-      filteredRooms = filteredRooms?.sort((a, b) => b.price - a.price);
-      break;
-    default:
-      filteredRooms = rooms;
-  }
+  // switch (filter) {
+  //   case "asc-capacity":
+  //     filteredRooms = filteredRooms?.sort((a, b) => a.capacity - b.capacity);
+  //     break;
+  //   case "desc-capacity":
+  //     filteredRooms = filteredRooms?.sort((a, b) => b.capacity - a.capacity);
+  //     break;
+  //   case "asc-price":
+  //     filteredRooms = filteredRooms?.sort((a, b) => a.price - b.price);
+  //     break;
+  //   case "desc-price":
+  //     filteredRooms = filteredRooms?.sort((a, b) => b.price - a.price);
+  //     break;
+  //   default:
+  //     filteredRooms = rooms;
+  // }
 
   return (
     <SectionContainer label={"Rooms"} description={"List of all the available rooms"}>
@@ -69,14 +48,7 @@ function Rooms() {
           </Link>
         </div>
       </div>
-      <RoomsTable rooms={rooms} headings={headings} />
-      <Pagination
-        pageNumber={page}
-        setPage={setPage}
-        currentDataCount={rooms.length}
-        totalCount={count}
-        paginationStep={PAGINATION_STEP}
-      />
+      <RoomsTable headings={headings} />
     </SectionContainer>
   );
 }

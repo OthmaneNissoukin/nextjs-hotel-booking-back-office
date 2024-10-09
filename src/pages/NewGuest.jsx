@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import { createGuest } from "../services/supabase/guests";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import SelectCountry from "../components/CountrySelector";
+import toast, { Toaster } from "react-hot-toast";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function NewGuest() {
   const navigate = useNavigate();
@@ -16,8 +18,12 @@ function NewGuest() {
   const { mutate, isPending } = useMutation({
     mutationFn: async (data) => await createGuest(data),
     onSuccess: () => {
+      toast.success("New guest has been created");
       reset();
       navigate("/guests");
+    },
+    onError: () => {
+      toast.error("Failed to create guest");
     },
   });
 
@@ -128,13 +134,14 @@ function NewGuest() {
 
         <div className="mt-5 flex gap-5 justify-end">
           <button
-            className="px-8 py-2 bg-blue-700 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
+            className="px-8 py-2 bg-blue-700 min-w-32 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
             disabled={isPending}
           >
-            {isPending ? "Submitting..." : "Save"}
+            {isPending ? <LoadingSpinner /> : "Save"}
           </button>
         </div>
       </form>
+      <Toaster position="top-center" />
     </div>
   );
 }

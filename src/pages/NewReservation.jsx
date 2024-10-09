@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { createGuest, getAllGuests } from "../services/supabase/guests";
+import { getAllGuests } from "../services/supabase/guests";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import DatePicker from "react-flatpickr";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +9,7 @@ import { getAllRooms } from "../services/supabase/rooms";
 import { areIntervalsOverlapping } from "date-fns";
 import { createNewReservation } from "../services/supabase/reservations";
 import toast, { Toaster } from "react-hot-toast";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function NewReservation() {
   const [bookingPeriod, setBookingPeriod] = useState([]);
@@ -69,6 +70,7 @@ function NewReservation() {
       reset();
       query.invalidateQueries({ queryKey: ["reservations"] });
       navigate("/reservations");
+      toast.success("Reservation has been created");
     },
     onError: (err) => {
       toast.error("Failed to submit!");
@@ -77,14 +79,17 @@ function NewReservation() {
   });
 
   const {
-    data: guests,
+    data: { guests } = {},
     error: guestsError,
-    isFetchingGuests,
+    isLoading: isLoadingGuests,
+    isError: isGuestsError,
   } = useQuery({ queryKey: ["guests"], queryFn: async () => getAllGuests() });
+
   const {
-    data: rooms,
+    data: { rooms } = {},
     error: roomsError,
-    isFetchingRooms,
+    isLoading: isLoadingRooms,
+    isError: isRoomsError,
   } = useQuery({ queryKey: ["rooms"], queryFn: async () => getAllRooms() });
 
   const targetRoom = rooms?.find((item) => item.id === selectedRoom);
@@ -135,9 +140,9 @@ function NewReservation() {
     // console.log(rooms?.find((item) => item.id === selectedRoom));
   }
 
-  if (isFetchingGuests || isFetchingRooms) return <h1>Please wait...</h1>;
+  if (isLoadingGuests || isLoadingRooms) return <h1>Please wait...</h1>;
 
-  if (guestsError || roomsError) return <h1>Error occured!</h1>;
+  if (isGuestsError || isRoomsError) return <h1>Error occured!</h1>;
 
   return (
     <div className="p-5">
@@ -274,11 +279,11 @@ function NewReservation() {
 
         <div className="mt-5 flex gap-5 justify-end">
           <button
-            className="px-8 py-2 bg-blue-700 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
+            className="px-8 py-2 bg-blue-700 min-w-32 text-stone-100 disabled:bg-blue-500 disabled:cursor-not-allowed"
             disabled={isPending}
             onClick={async () => await trigger("start_date")}
           >
-            {isPending ? "Submitting..." : "Save"}
+            {isPending ? <LoadingSpinner /> : "Save"}
           </button>
         </div>
       </form>

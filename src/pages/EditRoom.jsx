@@ -1,8 +1,9 @@
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createRoom, getRoomById, updateRoom } from "../services/supabase/rooms";
+import { getRoomById, updateRoom } from "../services/supabase/rooms";
 import toast, { Toaster } from "react-hot-toast";
 import { useParams } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function EditRoom() {
   const { id } = useParams();
@@ -203,10 +204,10 @@ function EditRoom() {
 
         <div className="mt-5 flex gap-5 justify-end">
           <button
-            className="px-8 py-2 bg-blue-700 text-stone-100 disabled:bg-blue-400 disabled:cursor-not-allowed"
+            className="px-8 py-2 min-w-32 bg-blue-700 text-stone-100 disabled:bg-blue-400 disabled:cursor-not-allowed"
             disabled={isPending}
           >
-            {isPending ? "Processing..." : "Save"}
+            {isPending ? <LoadingSpinner /> : "Save"}
           </button>
         </div>
       </form>

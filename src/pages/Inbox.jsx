@@ -13,42 +13,26 @@ import { PAGINATION_STEP } from "../utils/Utils";
 const tableHeadings = ["#", "date", "fullname", "email", "phone", "message", "actions"];
 
 function Inbox() {
-  const [page, setPage] = useState(0);
+  const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [search, setSearch] = useState("");
-  const {
-    data: { messages, count } = {},
-    isPending,
-    error,
-    isError,
-  } = useQuery({
-    queryKey: ["inbox", page],
-    queryFn: async () => getAllMessages(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
-  });
-  const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
-  function handleSearch(str) {
-    setSearch(str);
-    if (!str.trim() == "") {
-      setFilteredMessages(messages);
-    }
+  // function handleSearch(str) {
+  //   setSearch(str);
+  //   if (!str.trim() == "") {
+  //     setFilteredMessages(messages);
+  //   }
 
-    const tempMessages = messages.filter(
-      (item) =>
-        item.email.toLowerCase().includes(str) ||
-        item.fullname.toLowerCase().includes(str) ||
-        item.phone.toLowerCase().includes(str) ||
-        item.message.toLowerCase().includes(str)
-    );
+  //   const tempMessages = messages.filter(
+  //     (item) =>
+  //       item.email.toLowerCase().includes(str) ||
+  //       item.fullname.toLowerCase().includes(str) ||
+  //       item.phone.toLowerCase().includes(str) ||
+  //       item.message.toLowerCase().includes(str)
+  //   );
 
-    setFilteredMessages(tempMessages);
-  }
-
-  if (isPending) return <h1>Loading...</h1>;
-
-  if (isError) return <h1>{error.message}</h1>;
-
-  if (!messages) return <h1>No message was found</h1>;
+  //   setFilteredMessages(tempMessages);
+  // }
 
   return (
     <SectionContainer label={"Messages"} description={"List of all the available messages"}>
@@ -74,14 +58,7 @@ function Inbox() {
           </Link>
         </div>
       </div>
-      <InboxTable messages={search ? filteredMessages : messages} headings={headings} />
-      <Pagination
-        pageNumber={page}
-        setPage={setPage}
-        currentDataCount={messages.length}
-        totalCount={count}
-        paginationStep={PAGINATION_STEP}
-      />
+      <InboxTable headings={headings} />
     </SectionContainer>
   );
 }

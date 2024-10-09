@@ -1,13 +1,14 @@
 import { useForm } from "react-hook-form";
-import Modal from "../components/Modal";
 import { useMutation } from "@tanstack/react-query";
 import { createRoom } from "../services/supabase/rooms";
 import toast, { Toaster } from "react-hot-toast";
 import { useThemeProvider } from "../utils/ThemeContext";
+import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function NewRoom() {
   const { currentTheme, changeCurrentTheme } = useThemeProvider();
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -22,6 +23,7 @@ function NewRoom() {
     onSuccess: () => {
       reset();
       toast.success("Room has been created successfully!");
+      navigate("/rooms");
     },
     onError: (err) => console.log("Error", err),
   });
@@ -187,10 +189,10 @@ function NewRoom() {
 
         <div className="mt-5 flex gap-5 justify-end">
           <button
-            className="px-8 py-2 bg-blue-700 text-stone-100 disabled:bg-blue-400 disabled:cursor-not-allowed"
+            className="px-8 py-2 bg-blue-700 min-w-32 text-stone-100 disabled:bg-blue-400 disabled:cursor-not-allowed"
             disabled={isPending}
           >
-            {isPending ? "Processing..." : "Save"}
+            {isPending ? <LoadingSpinner /> : "Save"}
           </button>
         </div>
       </form>

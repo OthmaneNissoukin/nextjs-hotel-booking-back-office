@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import supabase from "../services/supabase/db";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 function Login() {
   const [session, setSession] = useState(true);
@@ -18,6 +20,7 @@ function Login() {
   } = useForm();
 
   async function onSubmit(data) {
+    // await new Promise((res) => setTimeout(res, 5000));
     const { data: authData, error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
@@ -77,10 +80,10 @@ function Login() {
               </div>
 
               <button
-                className="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                className="w-full text-white min-w-32 bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
                 // disabled={isSubmitting}
               >
-                {isSubmitting ? "Processing..." : "Sign In"}
+                {isSubmitting ? <FontAwesomeIcon icon={faSpinner} spinPulse /> : "Sign In"}
               </button>
             </form>
           </div>

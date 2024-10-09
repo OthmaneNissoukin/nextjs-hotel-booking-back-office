@@ -34,42 +34,28 @@ const tableHeadings = ["#", "room", "guest", "price", "start date", "end date", 
 // ];
 
 function Reservations() {
-  const [page, setPage] = useState(0);
   const [filteredReservations, setFilteredReservations] = useState([]);
-  const [search, setSearch] = useState("");
-  const {
-    data: { reservations, count } = {},
-    isPending,
-    error,
-  } = useQuery({
-    queryKey: ["reservations", page],
-    queryFn: async () => getAllReservation(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
-  });
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
-  function handleSearch(str) {
-    setSearch(str);
-    if (!str.trim() == "") {
-      setFilteredReservations(reservations);
-    }
+  const [search, setSearch] = useState("");
 
-    const tempReservations = reservations.filter(
-      (item) =>
-        item.guests?.nationalID.toLowerCase().includes(str) ||
-        item.guests?.fullname.toLowerCase().includes(str) ||
-        item.guests?.email.toLowerCase().includes(str) ||
-        item.rooms?.name.toLowerCase().includes(str) ||
-        item.guest_fullname?.toLowerCase().includes(str)
-    );
+  // function handleSearch(str) {
+  //   setSearch(str);
+  //   if (!str.trim() == "") {
+  //     setFilteredReservations(reservations);
+  //   }
 
-    setFilteredReservations(tempReservations);
-  }
+  //   const tempReservations = reservations.filter(
+  //     (item) =>
+  //       item.guests?.nationalID.toLowerCase().includes(str) ||
+  //       item.guests?.fullname.toLowerCase().includes(str) ||
+  //       item.guests?.email.toLowerCase().includes(str) ||
+  //       item.rooms?.name.toLowerCase().includes(str) ||
+  //       item.guest_fullname?.toLowerCase().includes(str)
+  //   );
 
-  if (isPending) return <h1>Loading...</h1>;
-
-  if (error) return <h1>Error, Please check your network and try again</h1>;
-
-  if (!reservations) return <h1>No reservation was found</h1>;
+  //   setFilteredReservations(tempReservations);
+  // }
 
   return (
     <SectionContainer label={"Reservations"} description={"List of all the available reservations"}>
@@ -95,14 +81,7 @@ function Reservations() {
           </Link>
         </div>
       </div>
-      <ReservationsTable reservations={search ? filteredReservations : reservations} headings={headings} />
-      <Pagination
-        pageNumber={page}
-        setPage={setPage}
-        currentDataCount={reservations.length}
-        totalCount={count}
-        paginationStep={PAGINATION_STEP}
-      />
+      <ReservationsTable headings={headings} />
     </SectionContainer>
   );
 }

@@ -1,15 +1,8 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import SectionContainer from "../ui/SectionContainer";
-import GuestsTable from "../components/GuestsTable";
-import { getAllGuests } from "../services/supabase/guests";
 import { Link } from "react-router-dom";
-import Modal from "../components/Modal";
-import Checkbox from "../components/Checkbox";
-import ColsControl from "../components/ColsControl";
-import Pagination from "../components/Pagination";
 import FilterButton from "../components/DropdownFilter";
-import { PAGINATION_STEP } from "../utils/Utils";
+import GuestsTable from "../components/GuestsTable";
+import SectionContainer from "../ui/SectionContainer";
 
 // const tableHeadings = ["#", "name", "nationalID", "email", "phone", "nationality", "actions"];
 const tableHeadings = ["#", "Fullname", "NationalID", "Email", "Phone", "Nationality", "Actions"];
@@ -46,43 +39,26 @@ const dummyGuests = [
 ];
 
 function Guests() {
-  const [page, setPage] = useState(0);
-  const [search, setSearch] = useState("");
-  const {
-    data: { guests, count } = {},
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["guests", page],
-    queryFn: async () => await getAllGuests(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
-  });
-
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
+  const [search, setSearch] = useState("");
 
-  const [tempGuests, setTempGuests] = useState(null);
+  // const [tempGuests, setTempGuests] = useState(null);
 
-  function handleSearch(str) {
-    setSearch(str);
-    if (!str.trim() == "") {
-      setTempGuests(guests);
-    }
+  // function handleSearch(str) {
+  //   setSearch(str);
+  //   if (!str.trim() == "") {
+  //     setTempGuests(guests);
+  //   }
 
-    const filteredGuests = guests.filter(
-      (item) =>
-        item.nationalID.toLowerCase().includes(str) ||
-        item.fullname.toLowerCase().includes(str) ||
-        item.email.toLowerCase().includes(str)
-    );
+  //   const filteredGuests = guests.filter(
+  //     (item) =>
+  //       item.nationalID.toLowerCase().includes(str) ||
+  //       item.fullname.toLowerCase().includes(str) ||
+  //       item.email.toLowerCase().includes(str)
+  //   );
 
-    setTempGuests(filteredGuests);
-  }
-
-  if (isLoading) return <h1>Loading...</h1>;
-
-  if (isError) return <h1>{error.message}</h1>;
-
-  if (!guests) return <h1>No guest was found. Please check your network</h1>;
+  //   setTempGuests(filteredGuests);
+  // }
 
   return (
     <SectionContainer label={"Guests"} description={"List of all the registered guests"}>
@@ -109,14 +85,7 @@ function Guests() {
           </Link>
         </div>
       </div>
-      <GuestsTable guests={tempGuests ?? guests} tableHeadings={headings} />
-      <Pagination
-        pageNumber={page}
-        setPage={setPage}
-        currentDataCount={guests.length}
-        totalCount={count}
-        paginationStep={PAGINATION_STEP}
-      />
+      <GuestsTable tableHeadings={headings} />
     </SectionContainer>
   );
 }

@@ -8,49 +8,28 @@ import FilterButton from "../components/DropdownFilter";
 import { getAllActivities } from "../services/supabase/logs";
 import LogsTable from "../components/LogsTable";
 import Pagination from "../components/Pagination";
+import { PAGINATION_STEP } from "../utils/Utils";
 
 const tableHeadings = ["#", "date", "category", "description", "actions"];
 
 function Logs() {
-  // const queryClient = useQueryClient();
-  const [page, setPage] = useState(0);
+  const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
-  // PAGINATION IS 0 BASED INDEXED
-  const [paginationStep, setPaginationStep] = useState(5);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [search, setSearch] = useState("");
-  const {
-    data: { count, logs } = {},
-    isPending,
-    error,
-    isError,
-    // isPreviousData,
-  } = useQuery({
-    queryKey: ["logs", page],
-    // keepPreviousData: true,
-    // pagination - 1 is for indexing, pagination is 0 based index
-    queryFn: async () => getAllActivities(page * paginationStep, (page + 1) * paginationStep - 1),
-  });
-  const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
   // console.log(isPreviousData);
 
-  function handleSearch(str) {
-    setSearch(str);
-    if (!str.trim() == "") {
-      setFilteredActivities(messages);
-    }
+  // function handleSearch(str) {
+  //   setSearch(str);
+  //   if (!str.trim() == "") {
+  //     setFilteredActivities(messages);
+  //   }
 
-    const tempActivities = messages.filter((item) => item.description.toLowerCase().includes(str));
+  //   const tempActivities = messages.filter((item) => item.description.toLowerCase().includes(str));
 
-    setFilteredActivities(tempActivities);
-  }
-
-  if (isPending) return <h1>Loading...</h1>;
-
-  if (isError) return <h1>{error.message}</h1>;
-
-  if (!logs) return <h1>No activity was found</h1>;
+  //   setFilteredActivities(tempActivities);
+  // }
 
   return (
     <SectionContainer label={"Recent Activities"} description={"List of all the available activities"}>
@@ -76,19 +55,7 @@ function Logs() {
           </Link>
         </div>
       </div>
-      <LogsTable
-        indexStartingFrom={paginationStep * page + 1}
-        logs={search ? filteredActivities : logs}
-        headings={headings}
-      />
-
-      <Pagination
-        pageNumber={page}
-        totalCount={count}
-        currentDataCount={logs.length}
-        paginationStep={paginationStep}
-        setPage={setPage}
-      />
+      <LogsTable headings={headings} />
     </SectionContainer>
   );
 }
