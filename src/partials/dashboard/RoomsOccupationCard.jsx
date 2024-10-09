@@ -8,7 +8,7 @@ import EditMenu from "../../components/DropdownEditMenu";
 import { tailwindConfig, hexToRGB } from "../../utils/Utils";
 import { eachDayOfInterval, format, isAfter, isBefore, isEqual, parse, subDays } from "date-fns";
 
-function RoomsOccupationCard({ groupedReservations, dateRange }) {
+function RoomsOccupationCard({ groupedReservations, dateRange, selected_date }) {
   let dateRangeObj = dateRange.reduce((acc, key) => {
     acc[key] = null;
     return acc;
@@ -23,12 +23,19 @@ function RoomsOccupationCard({ groupedReservations, dateRange }) {
     element.forEach((item) => filteredReservations.push(item));
   });
 
+  // THIS OBJECT SHOULD CONTAIN THE UNIQUE RESERVATIONS THAT INTERSECT WITH THE CURRENT SELECTED DATE RANGE TO LATER CALCULATE THE GUESTS TOTAL NUMBER
+  const uniqueDateRangeReservation = {};
+
   filteredReservations.forEach((reservation) => {
     // CREATING AN ARRAY FOR THE LASTEST 30 DAYS DAY BY DAY
-    const booking_period = eachDayOfInterval({
-      start: subDays(new Date(), 30),
-      end: new Date(),
-    }).map((date) => format(date, "yyyy-MM-dd"));
+    const booking_period = eachDayOfInterval(
+      selected_date
+        ? selected_date
+        : {
+            start: subDays(new Date(), 30),
+            end: new Date(),
+          }
+    ).map((date) => format(date, "yyyy-MM-dd"));
 
     // ITERATING OVER EACH DAY AND CHECKING IF THAT DAY HAS ANY RUNNING CONFIRMED RESERVATION
     booking_period.forEach((date) => {
@@ -42,13 +49,17 @@ function RoomsOccupationCard({ groupedReservations, dateRange }) {
         dateRangeObj[`${m}-${d}-${y}`] = dateRangeObj[`${m}-${d}-${y}`]
           ? dateRangeObj[`${m}-${d}-${y}`] + reservation.guests_count
           : reservation.guests_count;
+
+        // SETTING GUESTS COUNT AS VALUE TO THE UNIQUE RESERVATIONS
+        if (!uniqueDateRangeReservation[reservation.id])
+          uniqueDateRangeReservation[reservation.id] = reservation.guests_count;
       }
     });
   });
 
-  const stats = Object.values(dateRangeObj).map((item) => (item ? item : 0));
+  const guestsCountWithinDateRange = Object.values(uniqueDateRangeReservation).reduce((curr, next) => curr + next, 0);
 
-  const guestsAverage = Math.ceil(stats.reduce((curr, next) => curr + next, 0) / stats.length);
+  const stats = Object.values(dateRangeObj).map((item) => (item ? item : 0));
 
   const chartData = {
     labels: dateRange,
@@ -109,16 +120,20 @@ function RoomsOccupationCard({ groupedReservations, dateRange }) {
             </li>
           </EditMenu>
         </header>
-        <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Average</div>
+        <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">
+          Total (unique guests)
+        </div>
         <div className="flex items-start">
-          <div className="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-2">{guestsAverage} Guests</div>
+          <div className="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-2">
+            {guestsCountWithinDateRange} Guests
+          </div>
           <div className="text-sm font-medium text-red-700 px-1.5 bg-red-500/20 rounded-full">-14%</div>
         </div>
       </div>
       {/* Chart built with Chart.js 3 */}
       <div className="grow max-sm:max-h-[128px] max-h-[128px]">
         {/* Change the height attribute to adjust the chart height */}
-        <LineChart data={chartData} width={389} height={128} shouldFormat={false} />
+        <LineChart data={chartData} width={389} height={128} shouldFormat={false} key={dateRange} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import FilterButton from "../components/DropdownFilter";
 import Datepicker from "../components/Datepicker";
@@ -20,6 +20,7 @@ import Loader from "../components/Loader";
 import DashboardSkeleton from "../components/DashboardSkeleton";
 
 function Dashboard() {
+  const [date, setDate] = useState(null);
   const {
     data: { reservations } = {},
     isLoading,
@@ -69,10 +70,14 @@ function Dashboard() {
   // console.log("CONFIRMED RESERVATION");
   // console.log(confirmedReservations);
 
-  let dateRange = eachDayOfInterval({
-    start: subDays(new Date(), 30),
-    end: new Date(),
-  });
+  let dateRange = eachDayOfInterval(
+    date
+      ? date
+      : {
+          start: subDays(new Date(), 30),
+          end: new Date(),
+        }
+  );
 
   dateRange = dateRange.map((date) => format(date, "MM-dd-yyyy"));
   // console.log("DATE RANGE");
@@ -84,6 +89,14 @@ function Dashboard() {
 
   const cancelledReservations = reservations.filter((item) => item.status === "cancelled");
   const groupedReservationsByCancelReason = Object.groupBy(cancelledReservations, ({ cancel_reason }) => cancel_reason);
+
+  // FOR RESERVATIONS ACTIVITY
+  const recentReservations = reservations
+    .filter((item) => (item.deleted_at || item.admin_deleted_at ? false : true))
+    .toSorted((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const groupedRecentReservations = Object.groupBy(recentReservations, ({ created_at }) =>
+    format(created_at, "MM-dd-yyyy")
+  );
 
   return (
     <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -101,7 +114,7 @@ function Dashboard() {
               {/* Filter button */}
               {/* <FilterButton align="right" /> */}
               {/* Datepicker built with flatpickr */}
-              <Datepicker align="right" />
+              <Datepicker align="right" setDate={setDate} />
               {/* Add view button */}
               <button className="btn bg-gray-900 text-gray-100 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white">
                 <svg className="fill-current shrink-0 xs:hidden" width="16" height="16" viewBox="0 0 16 16">
@@ -115,8 +128,8 @@ function Dashboard() {
           {/* Cards */}
           <div className="grid grid-cols-12 gap-6">
             <LastThirtyDaysReservations groupedReservations={groupedReservations} dateRange={dateRange} />
-            <RoomsOccupationCard groupedReservations={groupedReservations} dateRange={dateRange} />
-            <RecentReservations groupedReservations={groupedReservations} dateRange={dateRange} />
+            <RoomsOccupationCard groupedReservations={groupedReservations} dateRange={dateRange} selected_date={date} />
+            <RecentReservations groupedReservations={groupedRecentReservations} dateRange={dateRange} />
             <CancelReasonsCard
               groupedCancelledReservations={groupedReservationsByCancelReason}
               total={cancelledReservations.length}

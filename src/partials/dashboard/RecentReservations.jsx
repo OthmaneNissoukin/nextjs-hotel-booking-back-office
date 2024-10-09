@@ -79,7 +79,7 @@ function RecentReservations({ dateRange, groupedReservations }) {
       {/* Chart built with Chart.js 3 */}
       <div className="grow max-sm:max-h-[128px] xl:max-h-[128px]">
         {/* Change the height attribute to adjust the chart height */}
-        <LineChart data={chartData} width={389} height={128} shouldFormat={false} />
+        <LineChart data={chartData} width={389} height={128} shouldFormat={false} key={dateRange} />
       </div>
     </div>
   );
