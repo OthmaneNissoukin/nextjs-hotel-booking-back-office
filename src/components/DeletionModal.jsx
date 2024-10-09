@@ -2,6 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "./Modal";
 import { useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import LoadingSpinner from "./LoadingSpinner";
 
 function DeletionModal({ targetName, mutationFuntion, queryKey }) {
   const closeRef = useRef(null);
@@ -26,7 +29,10 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
             type="button"
             className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-800 focus:outline-none focus:text-red-800 disabled:opacity-50 disabled:pointer-events-none dark:text-red-500 dark:hover:text-red-400 dark:focus:text-red-400"
           >
-            Delete
+            <span>
+              <FontAwesomeIcon icon={faTrash} />
+            </span>
+            <span>Delete</span>
           </button>
         </Modal.ToggleOpen>
         <Modal.Overlay>
@@ -49,7 +55,7 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
                   className="px-6 py-3 bg-red-800 text-red-50 disabled:bg-red-600 disabled:cursor-not-allowed"
                   disabled={isPending}
                 >
-                  {isPending ? "Deleting..." : "Delete"}
+                  {isPending ? <LoadingSpinner /> : "Delete"}
                 </button>
               </div>
             </div>

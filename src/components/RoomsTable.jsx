@@ -8,6 +8,9 @@ import Pagination from "./Pagination";
 import Loader from "./Loader";
 import { useQuery } from "@tanstack/react-query";
 import TableSkeleton from "./TableSkeleton";
+import DropdownEditMenu from "./DropdownEditMenu";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
 
 function RoomsTable({ headings }) {
   const [page, setPage] = useState(0);
@@ -68,17 +71,26 @@ function RoomsTable({ headings }) {
                     )}
                     {headings.find((col) => col.label === "actions" && col.show) && (
                       <Table.Cell>
-                        <Link
-                          className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
-                          to={`/rooms/edit/${item.id}`}
-                        >
-                          Edit
-                        </Link>
-                        <DeletionModal
-                          queryKey={"rooms"}
-                          targetName={item.name}
-                          mutationFuntion={async () => await deleteRoom(item.id)}
-                        />
+                        <DropdownEditMenu align="right" className="relative inline-flex">
+                          <li>
+                            <Link
+                              className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
+                              to={`/rooms/edit/${item.id}`}
+                            >
+                              <span>
+                                <FontAwesomeIcon icon={faPen} />
+                              </span>
+                              <span>Edit</span>
+                            </Link>
+                          </li>
+                          <li>
+                            <DeletionModal
+                              queryKey={"rooms"}
+                              targetName={item.name}
+                              mutationFuntion={async () => await deleteRoom(item.id)}
+                            />
+                          </li>
+                        </DropdownEditMenu>
                       </Table.Cell>
                     )}
                   </Table.Row>

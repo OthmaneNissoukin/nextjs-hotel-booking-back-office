@@ -9,6 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import { PAGINATION_STEP } from "../utils/Utils";
 import Pagination from "./Pagination";
 import TableSkeleton from "./TableSkeleton";
+import DropdownEditMenu from "./DropdownEditMenu";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
 
 function ReservationsTable({ headings }) {
   const [page, setPage] = useState(0);
@@ -67,29 +70,38 @@ function ReservationsTable({ headings }) {
                     )}
                     {headings.find((col) => col.label === "actions" && col.show) && (
                       <Table.Cell>
-                        {!(item.status === "confirmed" && isAfter(new Date(), new Date(item.end_date))) &&
-                          item.guest_id && (
-                            <Link
-                              className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
-                              to={`/reservations/edit/${item.id}`}
-                            >
-                              Edit
-                            </Link>
-                          )}
+                        <DropdownEditMenu align="right" className="relative inline-flex">
+                          {!(item.status === "confirmed" && isAfter(new Date(), new Date(item.end_date))) &&
+                            item.guest_id && (
+                              <li>
+                                <Link
+                                  className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
+                                  to={`/reservations/edit/${item.id}`}
+                                >
+                                  <span>
+                                    <FontAwesomeIcon icon={faPen} />
+                                  </span>
+                                  <span>Edit</span>
+                                </Link>
+                              </li>
+                            )}
 
-                        {/* PREVENT DELETING FOR BOTH (ACUTAL & CONFIRMED) AND ALSO (FUTUR COMING) RESERVATIONS  */}
-                        {(!(
-                          item.status === "confirmed" &&
-                          isAfter(new Date(item.start_date), new Date()) &&
-                          isBefore(new Date(item.end_date), new Date())
-                        ) ||
-                          (item.status === "confirmed" && item.isAfter(new Date(item.start_date), new Date()))) && (
-                          <DeletionModal
-                            queryKey={"reservations"}
-                            targetName={"The reservation"}
-                            mutationFuntion={async () => await deleteReservation(item.id, !!item.deleted_at)}
-                          />
-                        )}
+                          {/* PREVENT DELETING FOR BOTH (ACUTAL & CONFIRMED) AND ALSO (FUTUR COMING) RESERVATIONS  */}
+                          {(!(
+                            item.status === "confirmed" &&
+                            isAfter(new Date(item.start_date), new Date()) &&
+                            isBefore(new Date(item.end_date), new Date())
+                          ) ||
+                            (item.status === "confirmed" && item.isAfter(new Date(item.start_date), new Date()))) && (
+                            <li>
+                              <DeletionModal
+                                queryKey={"reservations"}
+                                targetName={"The reservation"}
+                                mutationFuntion={async () => await deleteReservation(item.id, !!item.deleted_at)}
+                              />
+                            </li>
+                          )}
+                        </DropdownEditMenu>
                       </Table.Cell>
                     )}
                   </Table.Row>
