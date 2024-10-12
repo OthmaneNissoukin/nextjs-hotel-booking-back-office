@@ -13,7 +13,7 @@ function EditGuest() {
     data: guest,
     error,
     isLoading,
-  } = useQuery({ queryKey: ["editedUser"], staleTime: 60 * 60 * 60, queryFn: async () => getGuestById(id) });
+  } = useQuery({ queryKey: ["editedUser"], staleTime: 60 * 60, queryFn: async () => getGuestById(id) });
 
   const {
     register,

@@ -8,30 +8,10 @@ import FilterButton from "../components/DropdownFilter";
 const tableHeadings = ["#", "name", "capacity", "price", "discount", "status", "actions"];
 
 function Rooms() {
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState(null);
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
-  // if (!rooms) return <h1>No room was found</h1>;
-
   // let filteredRooms = rooms ? [...rooms] : [];
-
-  // switch (filter) {
-  //   case "asc-capacity":
-  //     filteredRooms = filteredRooms?.sort((a, b) => a.capacity - b.capacity);
-  //     break;
-  //   case "desc-capacity":
-  //     filteredRooms = filteredRooms?.sort((a, b) => b.capacity - a.capacity);
-  //     break;
-  //   case "asc-price":
-  //     filteredRooms = filteredRooms?.sort((a, b) => a.price - b.price);
-  //     break;
-  //   case "desc-price":
-  //     filteredRooms = filteredRooms?.sort((a, b) => b.price - a.price);
-  //     break;
-  //   default:
-  //     filteredRooms = rooms;
-  // }
-
   return (
     <SectionContainer label={"Rooms"} description={"List of all the available rooms"}>
       <div className="xs:flex xs:justify-between xs:items-center mb-5">
@@ -48,7 +28,7 @@ function Rooms() {
           </Link>
         </div>
       </div>
-      <RoomsTable headings={headings} />
+      <RoomsTable headings={headings} filter={filter} />
     </SectionContainer>
   );
 }

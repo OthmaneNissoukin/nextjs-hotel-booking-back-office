@@ -35,6 +35,7 @@ export async function updateGuest(id, guest) {
   if (error) {
     console.log("supa error");
     console.log(error);
+    throw new Error(error.message);
   }
 
   return data;
@@ -52,6 +53,7 @@ export async function updateGuestWithPwd(id, name, nationality, countryFlag, pho
   if (error) {
     console.log("supa error");
     console.log(error);
+    throw new Error(error.message);
   }
 
   return data;
@@ -63,6 +65,7 @@ export async function createGuest(guest) {
   if (error) {
     console.log("ERROR SUPABASE");
     console.log(error);
+    throw new Error(error.message);
   }
 
   return data;
@@ -75,5 +78,6 @@ export async function deleteGuest(guestID) {
   if (error) {
     console.log("ERROR SUPABASE");
     console.log(error);
+    throw new Error(error.message);
   }
 }

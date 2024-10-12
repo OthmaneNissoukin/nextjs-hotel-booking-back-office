@@ -21,6 +21,10 @@ export async function deleteMessageByID(id) {
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  if (error) console.log(error);
+  if (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+
   return;
 }

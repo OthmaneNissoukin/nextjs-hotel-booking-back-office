@@ -3,7 +3,7 @@ import supabase from "../services/supabase/db";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 function Login() {
   const [session, setSession] = useState(true);
@@ -30,6 +30,15 @@ function Login() {
     });
 
     if (error) toast.error("Wrong email or password!", { duration: 5000 });
+  }
+
+  async function authAnounymous() {
+    toast.loading("Please wait...");
+    const { data, error } = await supabase.auth.signInAnonymously({});
+    toast.dismiss();
+    toast.error("Failed to authenticate!");
+
+    return data;
   }
 
   if (session) return;
@@ -79,12 +88,35 @@ function Login() {
                 )}
               </div>
 
-              <button
-                className="w-full text-white min-w-32 bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
-                // disabled={isSubmitting}
-              >
-                {isSubmitting ? <FontAwesomeIcon icon={faSpinner} spinPulse /> : "Sign In"}
-              </button>
+              <div className="space-y-3">
+                <button
+                  className="w-full text-white min-w-32 bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? <FontAwesomeIcon icon={faSpinner} spinPulse /> : "Sign In"}
+                </button>
+                <button
+                  onClick={authAnounymous}
+                  // onClick={() =>
+                  //   toast.promise(authAnounymous, {
+                  //     loading: "Please Wait...",
+                  //     success: "You are signed in",
+                  //     error: "Failed to authenticate",
+                  //   })
+                  // }
+                  type="button"
+                  className="w-full text-white min-w-32 bg-stone-600 hover:bg-stone-700 focus:ring-4 focus:outline-none focus:ring-stone-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-stone-600 dark:hover:bg-stone-700 dark:focus:ring-stone-800 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <FontAwesomeIcon icon={faBan} spinPulse /> <span>Sign In as Anonymous</span>
+                    </>
+                  ) : (
+                    "Sign In as Anonymous"
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>

@@ -1,15 +1,22 @@
 import { generateSlug } from "../../utils/Utils";
 import supabase from "./db";
 
-export async function getAllRooms(from = 0, to = 5) {
-  let {
-    data: rooms,
-    error,
-    count,
-  } = await supabase
-    .from("rooms")
-    .select("*, reservations(id,start_date, end_date, status)", { count: "exact" })
-    .range(from, to);
+export async function getAllRooms(from, to, filter = null) {
+  let query = supabase.from("rooms").select("*, reservations(id,start_date, end_date, status)", { count: "exact" });
+
+  // if (filter) query = query.order(filter.col, { ascending: filter.ascending });
+
+  if (from !== undefined && to !== undefined) {
+    query = query.range(from, to);
+  }
+
+  let { data: rooms, error, count } = await query;
+
+  console.log(rooms);
+
+  if (error) {
+    throw new Error("Failed to fetch rooms!");
+  }
 
   // await new Promise((res) => setTimeout(res, 2000));
 
@@ -73,7 +80,10 @@ export async function createRoom(roomObj, roomThumbnail, roomImages) {
   };
   const { data: room, error: roomError } = await supabase.from("rooms").insert([roomCols]).select().single();
 
-  console.log("room err", roomError);
+  //   if (roomError) {
+  //   console.log(roomError);
+  //   throw new Error(roomError.message);
+  // }
 
   const createdImages = [];
   let uploadFlag = false;
@@ -129,6 +139,7 @@ export async function updateRoom(id, roomObj, roomThumbnail, roomImages) {
       .from("rooms-imgs")
       .upload(thumbnailName, roomThumbnail);
     if (thumbnailError) {
+      console.log(thumbnailError);
       throw new Error("Failed to upload the thumbnail");
     }
   }
@@ -146,9 +157,15 @@ export async function updateRoom(id, roomObj, roomThumbnail, roomImages) {
   };
   const { data: room, error: roomError } = await supabase.from("rooms").update(roomCols).eq("id", id).select().single();
 
-  console.log("room err", roomError);
+  if (roomError) {
+    console.log("room err", roomError);
+    throw new Error("Failed to update!");
+  }
 
-  if (roomError && !roomImages && roomThumbnail) await supabase.storage.from("rooms-imgs").remove([thumbnailName]);
+  if (roomError && !roomImages && roomThumbnail) {
+    await supabase.storage.from("rooms-imgs").remove([thumbnailName]);
+    throw new Error("Failed to update room");
+  }
 
   if (!roomImages) return;
 
@@ -185,7 +202,7 @@ export async function updateRoom(id, roomObj, roomThumbnail, roomImages) {
     await supabase.storage.from("rooms-imgs").remove([thumbnailName, ...createdImages]);
     await supabase.from("rooms").delete().eq("id", room.id);
 
-    throw new Error("Failed to create room");
+    throw new Error("Failed to update room");
   }
 
   return room;

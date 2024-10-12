@@ -63,6 +63,11 @@ export async function createNewReservation(
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
+  if (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+
   return reservations;
 }
 
@@ -71,12 +76,22 @@ export async function deleteReservation(id, isDeletedByAdmin) {
   // ACTUAL DELETE WILL ONLY HAPPEN IN CASE IF THE CLIENT HAS ALREADY DELETED RESERVATION FROM HIS HISTORY
   if (isDeletedByAdmin) {
     const { error, data: reservations } = await supabase.from("reservations").delete().eq("id", id).select();
+
+    if (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
     return reservations;
   } else {
     const { data: reservations, error } = await supabase
       .from("reservations")
       .update({ admin_deleted_at: formatISO9075(new Date()) })
       .eq("id", id);
+
+    if (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
     return reservations;
   }
 }
@@ -88,21 +103,32 @@ export async function getReservationByID(id) {
     .eq("id", id)
     .single();
 
+  if (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+
   return reservations;
 }
 
-export async function getAllReservation(from, to) {
+export async function getAllReservation(from, to, search) {
   let query = supabase
     .from("reservations")
-    .select("*, rooms(thumbnail, name, capacity, price), guests(fullname, nationalID, email)", { count: "exact" })
+    .select("*, rooms(thumbnail, name, capacity, price)", { count: "exact" })
     .is("admin_deleted_at", null)
     .order("id", { ascending: false });
 
-  if (from && to) query.range(from, to);
+  if (search) {
+    query = query.or(`guest_fullname.ilike.%${search}%`, `rooms.name.ilike.%${search}%`);
+  }
+
+  if (from !== undefined && to !== undefined) query.range(from, to);
 
   const { data: reservations, error, count } = await query;
 
-  console.log(error);
+  if (error) {
+    console.log(error);
+  }
 
   return { reservations, count };
 }
@@ -120,6 +146,11 @@ export async function updateReseration(id, room_id, price, guests_count, start_d
     })
     .eq("id", id);
 
+  if (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+
   return reservations;
 }
 
@@ -129,6 +160,12 @@ export async function cancelReservation(id) {
     .update({ status: "cancelled" })
     .eq("id", id);
 
-  console.log("datetime", formatISO9075(new Date()));
+  // console.log("datetime", formatISO9075(new Date()));
+
+  if (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+
   return reservations;
 }

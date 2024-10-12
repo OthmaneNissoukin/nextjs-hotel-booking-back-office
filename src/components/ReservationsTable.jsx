@@ -13,22 +13,23 @@ import DropdownEditMenu from "./DropdownEditMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 
-function ReservationsTable({ headings }) {
+function ReservationsTable({ headings, search }) {
   const [page, setPage] = useState(0);
   const {
     data: { reservations, count } = {},
     isLoading,
     isError,
+    error,
   } = useQuery({
-    queryKey: ["reservations", page],
-    queryFn: async () => getAllReservation(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
+    queryKey: ["reservations", page, search],
+    queryFn: async () => getAllReservation(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP, search),
   });
 
   let indexStartingFrom = page * PAGINATION_STEP + 1;
 
   if (isLoading) return <TableSkeleton headings={headings.map((item) => item.label)} />;
 
-  if (isError) return <h1>Error, Please check your network and try again</h1>;
+  if (isError) return <h1>{error.message}</h1>;
 
   if (!reservations) return <h1>No reservation was found</h1>;
   return (

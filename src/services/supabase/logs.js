@@ -19,7 +19,10 @@ export async function getRecentActivities(count = 10) {
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  if (error) console.log(error);
+  if (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
 
   return logs;
 }
@@ -29,6 +32,10 @@ export async function deleteActivity(id) {
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  if (error) console.log(error);
+  if (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+
   return;
 }

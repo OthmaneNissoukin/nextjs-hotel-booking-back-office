@@ -12,7 +12,7 @@ import DropdownEditMenu from "./DropdownEditMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 
-function RoomsTable({ headings }) {
+function RoomsTable({ headings, filter }) {
   const [page, setPage] = useState(0);
   const {
     data: { rooms, count } = {},
@@ -20,11 +20,10 @@ function RoomsTable({ headings }) {
     isError,
     error,
   } = useQuery({
-    queryKey: ["rooms", page],
-    queryFn: async () => await getAllRooms(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP - 1),
+    queryKey: ["rooms", page, filter],
+    queryFn: async () => await getAllRooms(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP - 1, filter),
+    staleTime: 60 * 60,
   });
-
-  let indexStartingFrom = page * PAGINATION_STEP + 1;
 
   if (isLoading) return <TableSkeleton headings={headings.map((item) => item.label)} />;
 

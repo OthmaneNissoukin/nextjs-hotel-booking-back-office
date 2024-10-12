@@ -70,7 +70,7 @@ function EditReservation() {
     isError: isRoomsError,
     isLoading: isLoadingRooms,
     isSuccess,
-  } = useQuery({ queryKey: ["rooms"], queryFn: async () => getAllRooms(), staleTime: 60 * 60 * 60 });
+  } = useQuery({ queryKey: ["rooms"], queryFn: async () => getAllRooms(), staleTime: 60 * 60 });
 
   useEffect(() => {
     // Target room is needed to get data for validation for a specific room
@@ -137,9 +137,7 @@ function EditReservation() {
 
   if (isReservationError || isRoomsError) return <h1>Error occured!</h1>;
 
-  if (!reservation && !rooms) return <h1>Reservation not found!</h1>;
-
-  console.log(reservation);
+  if (!reservation || !rooms) return <h1>Reservation not found!</h1>;
 
   return (
     <div className="p-5">

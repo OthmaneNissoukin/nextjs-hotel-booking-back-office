@@ -34,28 +34,9 @@ const tableHeadings = ["#", "room", "guest", "price", "start date", "end date", 
 // ];
 
 function Reservations() {
-  const [filteredReservations, setFilteredReservations] = useState([]);
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
   const [search, setSearch] = useState("");
-
-  // function handleSearch(str) {
-  //   setSearch(str);
-  //   if (!str.trim() == "") {
-  //     setFilteredReservations(reservations);
-  //   }
-
-  //   const tempReservations = reservations.filter(
-  //     (item) =>
-  //       item.guests?.nationalID.toLowerCase().includes(str) ||
-  //       item.guests?.fullname.toLowerCase().includes(str) ||
-  //       item.guests?.email.toLowerCase().includes(str) ||
-  //       item.rooms?.name.toLowerCase().includes(str) ||
-  //       item.guest_fullname?.toLowerCase().includes(str)
-  //   );
-
-  //   setFilteredReservations(tempReservations);
-  // }
 
   return (
     <SectionContainer label={"Reservations"} description={"List of all the available reservations"}>
@@ -66,7 +47,7 @@ function Reservations() {
             placeholder="Search by room, guest, email, national id"
             className="w-72 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             value={search}
-            onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
@@ -81,7 +62,7 @@ function Reservations() {
           </Link>
         </div>
       </div>
-      <ReservationsTable headings={headings} />
+      <ReservationsTable search={search} headings={headings} />
     </SectionContainer>
   );
 }

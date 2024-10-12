@@ -11,7 +11,7 @@ function EditRoom() {
     data: room,
     error,
     isFetching,
-  } = useQuery({ queryKey: ["roomsEdit"], staleTime: 60 * 60 * 60, queryFn: async () => await getRoomById(id) });
+  } = useQuery({ queryKey: ["roomsEdit"], staleTime: 60 * 60, queryFn: async () => await getRoomById(id) });
 
   const {
     register,
@@ -30,7 +30,7 @@ function EditRoom() {
       query.invalidateQueries(["rooms"]);
       toast.success("Room has been updated successfully!");
     },
-    onError: (err) => console.log("Error", err),
+    onError: (err) => toast.error("Failed to update!"),
   });
 
   function onSubmitForm(data) {
