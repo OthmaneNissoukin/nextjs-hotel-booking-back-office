@@ -10,7 +10,7 @@ import { useState } from "react";
 import DropdownEditMenu from "./DropdownEditMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
-function GuestsTable({ tableHeadings = [] }) {
+function GuestsTable({ tableHeadings = [], search }) {
   const [page, setPage] = useState(0);
   const {
     data: { guests, count } = {},
@@ -18,8 +18,8 @@ function GuestsTable({ tableHeadings = [] }) {
     isError,
     error,
   } = useQuery({
-    queryKey: ["guests", page],
-    queryFn: async () => await getAllGuests(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
+    queryKey: ["guests", page, search],
+    queryFn: async () => await getAllGuests(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP, search),
   });
 
   let indexStartingFrom = page * PAGINATION_STEP + 1;

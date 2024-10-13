@@ -15,21 +15,7 @@ const tableHeadings = ["#", "date", "category", "description", "actions"];
 function Logs() {
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
 
-  const [filteredActivities, setFilteredActivities] = useState([]);
   const [search, setSearch] = useState("");
-
-  // console.log(isPreviousData);
-
-  // function handleSearch(str) {
-  //   setSearch(str);
-  //   if (!str.trim() == "") {
-  //     setFilteredActivities(messages);
-  //   }
-
-  //   const tempActivities = messages.filter((item) => item.description.toLowerCase().includes(str));
-
-  //   setFilteredActivities(tempActivities);
-  // }
 
   return (
     <SectionContainer label={"Recent Activities"} description={"List of all the available activities"}>
@@ -40,7 +26,7 @@ function Logs() {
             placeholder="Type to search..."
             className="w-72 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             value={search}
-            onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
@@ -55,7 +41,7 @@ function Logs() {
           </Link>
         </div>
       </div>
-      <LogsTable headings={headings} />
+      <LogsTable headings={headings} search={search} />
     </SectionContainer>
   );
 }

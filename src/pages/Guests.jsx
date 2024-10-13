@@ -42,24 +42,6 @@ function Guests() {
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
   const [search, setSearch] = useState("");
 
-  // const [tempGuests, setTempGuests] = useState(null);
-
-  // function handleSearch(str) {
-  //   setSearch(str);
-  //   if (!str.trim() == "") {
-  //     setTempGuests(guests);
-  //   }
-
-  //   const filteredGuests = guests.filter(
-  //     (item) =>
-  //       item.nationalID.toLowerCase().includes(str) ||
-  //       item.fullname.toLowerCase().includes(str) ||
-  //       item.email.toLowerCase().includes(str)
-  //   );
-
-  //   setTempGuests(filteredGuests);
-  // }
-
   return (
     <SectionContainer label={"Guests"} description={"List of all the registered guests"}>
       <div className="xs:flex xs:justify-between xs:items-center gap-5 mb-5">
@@ -70,7 +52,7 @@ function Guests() {
             placeholder="Email, NationalID or Name"
             className="w-72 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             value={search}
-            onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className="flex gap-5">
@@ -85,7 +67,7 @@ function Guests() {
           </Link>
         </div>
       </div>
-      <GuestsTable tableHeadings={headings} />
+      <GuestsTable tableHeadings={headings} search={search} />
     </SectionContainer>
   );
 }

@@ -119,7 +119,7 @@ export async function getAllReservation(from, to, search) {
     .order("id", { ascending: false });
 
   if (search) {
-    query = query.or(`guest_fullname.ilike.%${search}%`, `rooms.name.ilike.%${search}%`);
+    query = query.or(`guest_fullname.ilike.%${search}%`);
   }
 
   if (from !== undefined && to !== undefined) query.range(from, to);

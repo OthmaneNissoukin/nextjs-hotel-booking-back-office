@@ -1,11 +1,16 @@
 import supabase from "./db";
 
-export async function getAllMessages(from, to, limit) {
+export async function getAllMessages(from, to, limit, search) {
   let query = supabase.from("inbox").select("*", { count: "exact" }).order("id", { ascending: false });
 
-  if (limit) query.limit(limit);
+  if (search)
+    query = query.or(
+      `email.ilike.%${search}%,fullname.ilike.%${search}%,phone.ilike.%${search}%,message.ilike.%${search}%`
+    );
 
-  if (from && to) query.range(from, to);
+  if (limit) query = query.limit(limit);
+
+  if (from !== undefined && to !== undefined) query = query.range(from, to);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 

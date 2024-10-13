@@ -9,7 +9,7 @@ import { PAGINATION_STEP } from "../utils/Utils";
 import TableSkeleton from "./TableSkeleton";
 import Pagination from "./Pagination";
 
-function LogsTable({ headings }) {
+function LogsTable({ headings, search }) {
   const [page, setPage] = useState(0);
   // PAGINATION IS 0 BASED INDEXED
   const {
@@ -19,10 +19,10 @@ function LogsTable({ headings }) {
     isError,
     // isPreviousData,
   } = useQuery({
-    queryKey: ["logs", page],
+    queryKey: ["logs", page, search],
     // keepPreviousData: true,
     // pagination - 1 is for indexing, pagination is 0 based index
-    queryFn: async () => getAllActivities(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP - 1),
+    queryFn: async () => getAllActivities(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP - 1, search),
   });
 
   let indexStartingFrom = page * PAGINATION_STEP + 1;
@@ -50,11 +50,14 @@ function LogsTable({ headings }) {
 
                     {headings.find((col) => col.label === "date" && col.show) && (
                       <Table.Cell>
-                        {isToday(item.created_at)
-                          ? "Today"
-                          : isYesterday(item.created_at)
-                          ? "Yesterday"
-                          : format(item.created_at, "dd-MM-yyyy")}
+                        <span>
+                          {isToday(item.created_at)
+                            ? "Today"
+                            : isYesterday(item.created_at)
+                            ? "Yesterday"
+                            : format(item.created_at, "dd LLL")}
+                        </span>{" "}
+                        <span>{format(item.created_at, "HH:mm:ss")}</span>
                       </Table.Cell>
                     )}
 

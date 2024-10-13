@@ -7,10 +7,12 @@ export async function getGuestById(id) {
 
   return guests;
 }
-export async function getAllGuests(from, to) {
+export async function getAllGuests(from, to, search) {
   let query = supabase.from("guests").select("*", { count: "exact" });
 
-  if (from && to) query.range(from, to);
+  if (search) query = query.or(`fullname.ilike.%${search}%,email.ilike.%${search}%,nationalID.ilike.%${search}%`);
+  if (from !== undefined && to !== undefined) query = query.range(from, to);
+
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const { data: guests, error, count } = await query;
@@ -73,6 +75,7 @@ export async function createGuest(guest) {
 
 export async function deleteGuest(guestID) {
   const { data, error } = await supabase.from("guests").delete().eq("id", guestID).select();
+  console.log(guestID);
   console.log(data);
 
   if (error) {

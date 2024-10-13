@@ -14,25 +14,7 @@ const tableHeadings = ["#", "date", "fullname", "email", "phone", "message", "ac
 
 function Inbox() {
   const [headings, setHeadings] = useState(() => tableHeadings.map((item) => ({ label: item, show: true })));
-  const [filteredMessages, setFilteredMessages] = useState([]);
   const [search, setSearch] = useState("");
-
-  // function handleSearch(str) {
-  //   setSearch(str);
-  //   if (!str.trim() == "") {
-  //     setFilteredMessages(messages);
-  //   }
-
-  //   const tempMessages = messages.filter(
-  //     (item) =>
-  //       item.email.toLowerCase().includes(str) ||
-  //       item.fullname.toLowerCase().includes(str) ||
-  //       item.phone.toLowerCase().includes(str) ||
-  //       item.message.toLowerCase().includes(str)
-  //   );
-
-  //   setFilteredMessages(tempMessages);
-  // }
 
   return (
     <SectionContainer label={"Messages"} description={"List of all the available messages"}>
@@ -43,7 +25,7 @@ function Inbox() {
             placeholder="Search by name, email, message"
             className="w-72 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             value={search}
-            onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
@@ -58,7 +40,7 @@ function Inbox() {
           </Link>
         </div>
       </div>
-      <InboxTable headings={headings} />
+      <InboxTable headings={headings} search={search} />
     </SectionContainer>
   );
 }

@@ -1,13 +1,12 @@
 import supabase from "./db";
 
-export async function getAllActivities(from = 0, to = 5) {
-  let {
-    data: logs,
-    error,
-    count,
-  } = await supabase.from("logs").select("*", { count: "exact" }).order("id", { ascending: false }).range(from, to);
+export async function getAllActivities(from = 0, to = 5, search) {
+  let query = supabase.from("logs").select("*", { count: "exact" }).order("id", { ascending: false }).range(from, to);
 
+  if (from !== undefined && to !== undefined) query.or(`description.ilike.%${search}%`);
   // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  let { data: logs, error, count } = await query;
 
   if (error) console.log(error);
 

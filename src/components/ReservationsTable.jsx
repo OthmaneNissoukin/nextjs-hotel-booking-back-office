@@ -3,7 +3,7 @@ import { deleteRoom } from "../services/supabase/rooms";
 import DeletionModal from "./DeletionModal";
 import Table from "./Table/Table";
 import { deleteReservation, getAllReservation } from "../services/supabase/reservations";
-import { isAfter, isBefore } from "date-fns";
+import { differenceInDays, format, isAfter, isBefore } from "date-fns";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PAGINATION_STEP } from "../utils/Utils";
@@ -60,12 +60,16 @@ function ReservationsTable({ headings, search }) {
                     {headings.find((col) => col.label === "price" && col.show) && (
                       <Table.Cell>${item.reserved_price.toFixed(2)}</Table.Cell>
                     )}
-                    {headings.find((col) => col.label === "start date" && col.show) && (
-                      <Table.Cell>{item.start_date}</Table.Cell>
+                    {headings.find((col) => col.label === "booking range" && col.show) && (
+                      <Table.Cell>
+                        {format(item.start_date, "LLL dd yyyy")} &ndash; {format(item.end_date, "LLL dd yyyy")}
+                        <br />
+                        <span className="italic font-extralight text-slate-500">
+                          {differenceInDays(item.end_date, item.start_date)} Nights
+                        </span>{" "}
+                      </Table.Cell>
                     )}
-                    {headings.find((col) => col.label === "end date" && col.show) && (
-                      <Table.Cell>{item.end_date}</Table.Cell>
-                    )}
+
                     {headings.find((col) => col.label === "status" && col.show) && (
                       <Table.Cell>{item.status}</Table.Cell>
                     )}

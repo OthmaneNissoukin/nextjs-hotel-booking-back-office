@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import TableSkeleton from "./TableSkeleton";
 import { PAGINATION_STEP } from "../utils/Utils";
 
-function InboxTable({ headings }) {
+function InboxTable({ headings, search }) {
   const [page, setPage] = useState(0);
   const {
     data: { messages, count } = {},
@@ -17,8 +17,8 @@ function InboxTable({ headings }) {
     error,
     isError,
   } = useQuery({
-    queryKey: ["inbox", page],
-    queryFn: async () => getAllMessages(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP),
+    queryKey: ["inbox", page, search],
+    queryFn: async () => getAllMessages(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP, undefined, search),
   });
 
   let indexStartingFrom = page * PAGINATION_STEP + 1;
@@ -46,11 +46,14 @@ function InboxTable({ headings }) {
 
                     {headings.find((col) => col.label === "date" && col.show) && (
                       <Table.Cell>
-                        {isToday(item.created_at)
-                          ? "Today"
-                          : isYesterday(item.created_at)
-                          ? "Yesterday"
-                          : format(item.created_at, "dd-MM-yyyy")}
+                        <span>
+                          {isToday(item.created_at)
+                            ? "Today"
+                            : isYesterday(item.created_at)
+                            ? "Yesterday"
+                            : format(item.created_at, "dd LLL")}
+                        </span>{" "}
+                        <span>{format(item.created_at, "HH:mm")}</span>
                       </Table.Cell>
                     )}
 
