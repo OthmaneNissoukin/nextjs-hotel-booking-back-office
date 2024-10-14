@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import TableSkeleton from "./TableSkeleton";
 import { PAGINATION_STEP } from "../utils/Utils";
+import Modal from "./Modal";
 
 function InboxTable({ headings, search }) {
   const [page, setPage] = useState(0);
@@ -35,54 +36,58 @@ function InboxTable({ headings, search }) {
         <div className="-m-1.5 overflow-x-auto">
           <div className="p-1.5 min-w-full inline-block align-middle">
             <div className="overflow-hidden">
-              <Table>
-                <Table.Head headings={headings} />
+              <Modal>
+                <Table>
+                  <Table.Head headings={headings} />
 
-                {messages?.map((item, index) => (
-                  <Table.Row>
-                    {headings.find((col) => col.label === "#" && col.show) && (
-                      <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
-                    )}
+                  {messages?.map((item, index) => (
+                    <Table.Row>
+                      {headings.find((col) => col.label === "#" && col.show) && (
+                        <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
+                      )}
 
-                    {headings.find((col) => col.label === "date" && col.show) && (
-                      <Table.Cell>
-                        <span>
-                          {isToday(item.created_at)
-                            ? "Today"
-                            : isYesterday(item.created_at)
-                            ? "Yesterday"
-                            : format(item.created_at, "dd LLL")}
-                        </span>{" "}
-                        <span>{format(item.created_at, "HH:mm")}</span>
-                      </Table.Cell>
-                    )}
+                      {headings.find((col) => col.label === "date" && col.show) && (
+                        <Table.Cell>
+                          <span>
+                            {isToday(item.created_at)
+                              ? "Today"
+                              : isYesterday(item.created_at)
+                              ? "Yesterday"
+                              : format(item.created_at, "dd LLL")}
+                          </span>{" "}
+                          <span>{format(item.created_at, "HH:mm")}</span>
+                        </Table.Cell>
+                      )}
 
-                    {headings.find((col) => col.label === "fullname" && col.show) && (
-                      <Table.Cell>{String(item.fullname)}</Table.Cell>
-                    )}
+                      {headings.find((col) => col.label === "fullname" && col.show) && (
+                        <Table.Cell>{String(item.fullname)}</Table.Cell>
+                      )}
 
-                    {headings.find((col) => col.label === "email" && col.show) && (
-                      <Table.Cell>{String(item.email)}</Table.Cell>
-                    )}
-                    {headings.find((col) => col.label === "phone" && col.show) && <Table.Cell>{item.phone}</Table.Cell>}
-                    {headings.find((col) => col.label === "message" && col.show) && (
-                      <Table.Cell>
-                        {item.message.length > 25 ? `${item.message.slice(0, 25)}...` : item.message}
-                      </Table.Cell>
-                    )}
+                      {headings.find((col) => col.label === "email" && col.show) && (
+                        <Table.Cell>{String(item.email)}</Table.Cell>
+                      )}
+                      {headings.find((col) => col.label === "phone" && col.show) && (
+                        <Table.Cell>{item.phone}</Table.Cell>
+                      )}
+                      {headings.find((col) => col.label === "message" && col.show) && (
+                        <Table.Cell>
+                          {item.message.length > 25 ? `${item.message.slice(0, 25)}...` : item.message}
+                        </Table.Cell>
+                      )}
 
-                    {headings.find((col) => col.label === "actions" && col.show) && (
-                      <Table.Cell>
-                        <DeletionModal
-                          queryKey={"inbox"}
-                          targetName={"The message"}
-                          mutationFuntion={async () => await deleteMessageByID(item.id)}
-                        />
-                      </Table.Cell>
-                    )}
-                  </Table.Row>
-                ))}
-              </Table>
+                      {headings.find((col) => col.label === "actions" && col.show) && (
+                        <Table.Cell>
+                          <DeletionModal
+                            queryKey={"inbox"}
+                            targetName={"The message"}
+                            mutationFuntion={async () => await deleteMessageByID(item.id)}
+                          />
+                        </Table.Cell>
+                      )}
+                    </Table.Row>
+                  ))}
+                </Table>
+              </Modal>
             </div>
           </div>
         </div>

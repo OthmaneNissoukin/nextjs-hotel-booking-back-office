@@ -25,7 +25,7 @@ function NewRoom() {
       toast.success("Room has been created successfully!");
       navigate("/rooms");
     },
-    onError: (err) => console.log("Error", err),
+    onError: (err) => toast.error("Failed to create room!"),
   });
 
   function onSubmitForm(data) {

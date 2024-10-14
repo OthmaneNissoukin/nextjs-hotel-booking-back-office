@@ -10,7 +10,7 @@ function EditRoom() {
   const {
     data: room,
     error,
-    isFetching,
+    isLoading,
   } = useQuery({ queryKey: ["roomsEdit"], staleTime: 60 * 60, queryFn: async () => await getRoomById(id) });
 
   const {
@@ -26,21 +26,21 @@ function EditRoom() {
     mutationKey: ["rooms"],
     mutationFn: async (data) => await updateRoom(parseInt(id), data, data.thumbnail[0], Array.from(data.images)),
     onSuccess: () => {
-      reset();
       query.invalidateQueries(["rooms"]);
+      query.invalidateQueries(["roomsEdit"]);
       toast.success("Room has been updated successfully!");
     },
     onError: (err) => toast.error("Failed to update!"),
   });
 
   function onSubmitForm(data) {
-    console.log(data);
+    data.prevThumbnail = room.thumbnail;
     // return;
     // console.log(errors);
     mutate(data);
   }
 
-  if (isFetching) return <h1>Loading...</h1>;
+  if (isLoading) return <h1>Loading...</h1>;
   if (error) {
     console.log(error);
     return <h1>Error occured</h1>;
@@ -186,8 +186,8 @@ function EditRoom() {
           </label>
           {/* TODO: DISCOUNT MAX VALUE MUST BE LESS THAN THE PRICE ITSELF. ADD THE LOGIC LATER */}
           <textarea
-            rows={8}
             defaultValue={room.description}
+            rows={8}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-y"
             {...register("description", { maxLength: 3000, minLength: 120, required: true })}
           ></textarea>

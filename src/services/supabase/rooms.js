@@ -26,6 +26,8 @@ export async function getAllRooms(from, to, filter = null) {
 export async function getRoomById(id) {
   let { data: rooms, error } = await supabase.from("rooms").select("*").eq("id", id).single();
 
+  console.log(rooms);
+
   return rooms;
 }
 
@@ -33,29 +35,6 @@ export async function getRoomImages(id) {
   let { data: room_images, error } = await supabase.from("room_images").select("*").eq("room_id", id);
 
   return room_images;
-}
-
-export async function filterRoomsByDate(start = "2024-09-21", end = "2024-09-27") {
-  let { data: reservations, error } = await supabase
-    .from("reservations")
-    .select("*")
-    .eq("status", "confirmed")
-    .or(
-      `and(start_date.gte.${start},start_date.lte.${end}),and(end_date.gte.${start},end_date.lte.${end}),and(start_date.lte.${start}, end_date.gte.${end})`
-    );
-
-  if (error) {
-    console.log(error);
-  }
-
-  const reservations_ids = reservations?.map((item) => item.room_id) ?? [];
-
-  let { data: rooms, rooms_error } = await supabase
-    .from("rooms")
-    .select("*")
-    .not("id", "in", `(${reservations_ids.join(",")})`);
-
-  return rooms;
 }
 
 export async function createRoom(roomObj, roomThumbnail, roomImages) {
@@ -125,16 +104,18 @@ export async function createRoom(roomObj, roomThumbnail, roomImages) {
 }
 
 export async function deleteRoom(id) {
-  const { error } = await supabase.from("rooms").delete().eq("id", id);
+  const { data: room, error } = await supabase.from("rooms").delete().eq("id", id).select();
 
-  if (error) {
+  if (error || !room.length) {
     throw new Error("Failed to delete the room");
   }
 }
 
 export async function updateRoom(id, roomObj, roomThumbnail, roomImages) {
+  console.log(roomThumbnail);
   const thumbnailName = `${new Date().getTime()}`;
   if (roomThumbnail) {
+    console.log("uploading....");
     const { data: thumbnail, error: thumbnailError } = await supabase.storage
       .from("rooms-imgs")
       .upload(thumbnailName, roomThumbnail);
@@ -145,7 +126,7 @@ export async function updateRoom(id, roomObj, roomThumbnail, roomImages) {
   }
 
   const roomCols = {
-    thumbnail: roomThumbnail ? thumbnailName : roomObj.thumbnail,
+    thumbnail: roomThumbnail ? thumbnailName : roomObj.prevThumbnail,
     name: roomObj.name,
     capacity: roomObj.capacity,
     price: roomObj.price,
@@ -155,9 +136,10 @@ export async function updateRoom(id, roomObj, roomThumbnail, roomImages) {
     discount: roomObj.discount,
     slug: generateSlug(roomObj.name),
   };
-  const { data: room, error: roomError } = await supabase.from("rooms").update(roomCols).eq("id", id).select().single();
 
-  if (roomError) {
+  const { data: room, error: roomError } = await supabase.from("rooms").update(roomCols).eq("id", id).select();
+
+  if (roomError || !room.length) {
     console.log("room err", roomError);
     throw new Error("Failed to update!");
   }

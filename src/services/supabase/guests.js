@@ -34,25 +34,7 @@ export async function updateGuest(id, guest) {
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  if (error) {
-    console.log("supa error");
-    console.log(error);
-    throw new Error(error.message);
-  }
-
-  return data;
-}
-
-export async function updateGuestWithPwd(id, name, nationality, countryFlag, phone, email, password) {
-  const { data, error } = await supabase
-    .from("guests")
-    .update({ fullname: name, nationality, phone, email, countryFlag, password })
-    .eq("id", id)
-    .select();
-
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  if (error) {
+  if (error || !data.length) {
     console.log("supa error");
     console.log(error);
     throw new Error(error.message);

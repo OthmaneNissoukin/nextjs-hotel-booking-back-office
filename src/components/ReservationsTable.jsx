@@ -12,6 +12,7 @@ import TableSkeleton from "./TableSkeleton";
 import DropdownEditMenu from "./DropdownEditMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
+import Modal from "./Modal";
 
 function ReservationsTable({ headings, search }) {
   const [page, setPage] = useState(0);
@@ -38,80 +39,82 @@ function ReservationsTable({ headings, search }) {
         <div className="-m-1.5 overflow-x-auto">
           <div className="p-1.5 min-w-full inline-block align-middle">
             <div className="overflow-hidden">
-              <Table>
-                <Table.Head headings={headings} />
+              <Modal>
+                <Table>
+                  <Table.Head headings={headings} />
 
-                {reservations?.map((item, index) => (
-                  <Table.Row>
-                    {headings.find((col) => col.label === "#" && col.show) && (
-                      <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
-                    )}
+                  {reservations?.map((item, index) => (
+                    <Table.Row>
+                      {headings.find((col) => col.label === "#" && col.show) && (
+                        <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
+                      )}
 
-                    {headings.find((col) => col.label === "room" && col.show) && (
-                      <Table.Cell>{String(item.rooms?.name)}</Table.Cell>
-                    )}
+                      {headings.find((col) => col.label === "room" && col.show) && (
+                        <Table.Cell>{String(item.rooms?.name)}</Table.Cell>
+                      )}
 
-                    {headings.find((col) => col.label === "guest" && col.show) && (
-                      <Table.Cell>
-                        {String(item.guests?.fullname ? item.guests?.fullname : item?.guest_fullname)}
-                        {!item.guest_id && <span className="text-xs text-red-800 italic">left</span>}
-                      </Table.Cell>
-                    )}
-                    {headings.find((col) => col.label === "price" && col.show) && (
-                      <Table.Cell>${item.reserved_price.toFixed(2)}</Table.Cell>
-                    )}
-                    {headings.find((col) => col.label === "booking range" && col.show) && (
-                      <Table.Cell>
-                        {format(item.start_date, "LLL dd yyyy")} &ndash; {format(item.end_date, "LLL dd yyyy")}
-                        <br />
-                        <span className="italic font-extralight text-slate-500">
-                          {differenceInDays(item.end_date, item.start_date)} Nights
-                        </span>{" "}
-                      </Table.Cell>
-                    )}
+                      {headings.find((col) => col.label === "guest" && col.show) && (
+                        <Table.Cell>
+                          {String(item.guests?.fullname ? item.guests?.fullname : item?.guest_fullname)}
+                          {!item.guest_id && <span className="text-xs text-red-800 italic">left</span>}
+                        </Table.Cell>
+                      )}
+                      {headings.find((col) => col.label === "price" && col.show) && (
+                        <Table.Cell>${item.reserved_price.toFixed(2)}</Table.Cell>
+                      )}
+                      {headings.find((col) => col.label === "booking range" && col.show) && (
+                        <Table.Cell>
+                          {format(item.start_date, "LLL dd yyyy")} &ndash; {format(item.end_date, "LLL dd yyyy")}
+                          <br />
+                          <span className="italic font-extralight text-slate-500">
+                            {differenceInDays(item.end_date, item.start_date)} Nights
+                          </span>{" "}
+                        </Table.Cell>
+                      )}
 
-                    {headings.find((col) => col.label === "status" && col.show) && (
-                      <Table.Cell>{item.status}</Table.Cell>
-                    )}
-                    {headings.find((col) => col.label === "actions" && col.show) && (
-                      <Table.Cell>
-                        <DropdownEditMenu align="right" className="relative inline-flex">
-                          {!(item.status === "confirmed" && isAfter(new Date(), new Date(item.end_date))) &&
-                            item.guest_id && (
+                      {headings.find((col) => col.label === "status" && col.show) && (
+                        <Table.Cell>{item.status}</Table.Cell>
+                      )}
+                      {headings.find((col) => col.label === "actions" && col.show) && (
+                        <Table.Cell>
+                          <DropdownEditMenu align="right" className="relative inline-flex">
+                            {!(item.status === "confirmed" && isAfter(new Date(), new Date(item.end_date))) &&
+                              item.guest_id && (
+                                <li>
+                                  <Link
+                                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
+                                    to={`/reservations/edit/${item.id}`}
+                                  >
+                                    <span>
+                                      <FontAwesomeIcon icon={faPen} />
+                                    </span>
+                                    <span>Edit</span>
+                                  </Link>
+                                </li>
+                              )}
+
+                            {/* PREVENT DELETING FOR BOTH (ACUTAL & CONFIRMED) AND ALSO (FUTUR COMING) RESERVATIONS  */}
+                            {(!(
+                              item.status === "confirmed" &&
+                              isAfter(new Date(item.start_date), new Date()) &&
+                              isBefore(new Date(item.end_date), new Date())
+                            ) ||
+                              (item.status === "confirmed" && item.isAfter(new Date(item.start_date), new Date()))) && (
                               <li>
-                                <Link
-                                  className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
-                                  to={`/reservations/edit/${item.id}`}
-                                >
-                                  <span>
-                                    <FontAwesomeIcon icon={faPen} />
-                                  </span>
-                                  <span>Edit</span>
-                                </Link>
+                                <DeletionModal
+                                  queryKey={"reservations"}
+                                  targetName={"The reservation"}
+                                  mutationFuntion={async () => await deleteReservation(item.id, !!item.deleted_at)}
+                                />
                               </li>
                             )}
-
-                          {/* PREVENT DELETING FOR BOTH (ACUTAL & CONFIRMED) AND ALSO (FUTUR COMING) RESERVATIONS  */}
-                          {(!(
-                            item.status === "confirmed" &&
-                            isAfter(new Date(item.start_date), new Date()) &&
-                            isBefore(new Date(item.end_date), new Date())
-                          ) ||
-                            (item.status === "confirmed" && item.isAfter(new Date(item.start_date), new Date()))) && (
-                            <li>
-                              <DeletionModal
-                                queryKey={"reservations"}
-                                targetName={"The reservation"}
-                                mutationFuntion={async () => await deleteReservation(item.id, !!item.deleted_at)}
-                              />
-                            </li>
-                          )}
-                        </DropdownEditMenu>
-                      </Table.Cell>
-                    )}
-                  </Table.Row>
-                ))}
-              </Table>
+                          </DropdownEditMenu>
+                        </Table.Cell>
+                      )}
+                    </Table.Row>
+                  ))}
+                </Table>
+              </Modal>
             </div>
           </div>
         </div>

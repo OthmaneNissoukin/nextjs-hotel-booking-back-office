@@ -1,7 +1,7 @@
 import { cloneElement, createContext, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-const ModalContext = createContext();
+export const ModalContext = createContext();
 
 function escListener(e, close) {
   if (e.key.toLowerCase() === "escape") close();
@@ -30,7 +30,11 @@ function ToggleOpen({ children }) {
 function ToggleClose({ children }) {
   const { close } = useContext(ModalContext);
 
-  return cloneElement(children, { onClick: () => close() });
+  return cloneElement(children, {
+    onClick: () => {
+      close();
+    },
+  });
 }
 
 function Overlay({ children }) {

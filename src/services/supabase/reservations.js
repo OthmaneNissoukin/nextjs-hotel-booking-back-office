@@ -77,7 +77,7 @@ export async function deleteReservation(id, isDeletedByAdmin) {
   if (isDeletedByAdmin) {
     const { error, data: reservations } = await supabase.from("reservations").delete().eq("id", id).select();
 
-    if (error) {
+    if (error || !reservations.length) {
       console.log(error);
       throw new Error(error.message);
     }
@@ -88,7 +88,7 @@ export async function deleteReservation(id, isDeletedByAdmin) {
       .update({ admin_deleted_at: formatISO9075(new Date()) })
       .eq("id", id);
 
-    if (error) {
+    if (error || !reservations.length) {
       console.log(error);
       throw new Error(error.message);
     }
@@ -144,25 +144,10 @@ export async function updateReseration(id, room_id, price, guests_count, start_d
       end_date: formatISO9075(new Date(end_date)),
       status,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select();
 
-  if (error) {
-    console.log(error);
-    throw new Error(error.message);
-  }
-
-  return reservations;
-}
-
-export async function cancelReservation(id) {
-  const { data: reservations, error } = await supabase
-    .from("reservations")
-    .update({ status: "cancelled" })
-    .eq("id", id);
-
-  // console.log("datetime", formatISO9075(new Date()));
-
-  if (error) {
+  if (error || !reservations.length) {
     console.log(error);
     throw new Error(error.message);
   }
