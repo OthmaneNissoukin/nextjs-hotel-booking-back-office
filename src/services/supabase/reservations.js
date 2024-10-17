@@ -1,5 +1,6 @@
 import { formatISO, formatISO9075 } from "date-fns";
 import supabase from "./db";
+import { data } from "autoprefixer";
 
 export async function getRoomReservations(id) {
   let { data: reservations, error } = await supabase.from("reservations").select("*").eq("room_id", id);
@@ -44,6 +45,10 @@ export async function createNewReservation(
   guest_fullname,
   status
 ) {
+  const authUser = await supabase.auth.getUser();
+
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
   const { data: reservations, error } = await supabase
     .from("reservations")
     .insert([
@@ -71,17 +76,19 @@ export async function createNewReservation(
   return reservations;
 }
 
-export async function deleteReservation(id, isDeletedByAdmin) {
+export async function deleteReservation(id, wasDeletedByGuest) {
+  const authUser = await supabase.auth.getUser();
+
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
   // FOR DELETION IM USING SOFT DELETE
   // ACTUAL DELETE WILL ONLY HAPPEN IN CASE IF THE CLIENT HAS ALREADY DELETED RESERVATION FROM HIS HISTORY
-  if (isDeletedByAdmin) {
+  if (wasDeletedByGuest) {
     const { error, data: reservations } = await supabase.from("reservations").delete().eq("id", id).select();
-
+    console.log(reservations);
     if (error || !reservations.length) {
-      console.log(error);
       throw new Error(error.message);
     }
-    return reservations;
   } else {
     const { data: reservations, error } = await supabase
       .from("reservations")
@@ -134,6 +141,9 @@ export async function getAllReservation(from, to, search) {
 }
 
 export async function updateReseration(id, room_id, price, guests_count, start_date, end_date, status) {
+  const authUser = await supabase.auth.getUser();
+
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
   const { data: reservations, error } = await supabase
     .from("reservations")
     .update({

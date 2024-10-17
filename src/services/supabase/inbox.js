@@ -22,6 +22,9 @@ export async function getAllMessages(from, to, limit, search) {
 }
 
 export async function deleteMessageByID(id) {
+  const authUser = await supabase.auth.getUser();
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
   let { error } = await supabase.from("inbox").delete().eq("id", id);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));

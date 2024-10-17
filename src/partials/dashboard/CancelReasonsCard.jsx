@@ -85,7 +85,6 @@ function CancelReasonsCard({ groupedCancelledReservations, total }) {
               <div className="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-2">
                 {String(total).padStart(3, "0")}
               </div>
-              <div className="text-sm font-medium text-red-700 px-1.5 bg-red-500/20 rounded-full">-22%</div>
             </div>
           </div>
           <div className="grow">

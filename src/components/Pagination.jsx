@@ -12,7 +12,7 @@ function Pagination({ pageNumber, paginationStep, totalCount, currentDataCount, 
         <button
           onClick={() => setPage(pageNumber - 1)}
           disabled={pageNumber === 0}
-          className="flex items-center justify-center px-4 h-10 text-base font-medium text-white disabled:hover:text-white bg-gray-800 disabled:hover:bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 disabled:dark:hover:bg-gray-800 dark:hover:text-white disabled:dark:hover:text-gray-400 disabled:cursor-not-allowed "
+          className="flex items-center bg-gray-200 dark:bg-slate-800  justify-center px-4 h-10 text-base font-medium text-white disabled:hover:text-white  disabled:hover:bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900  dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 disabled:dark:hover:bg-gray-800 dark:hover:text-white disabled:dark:hover:text-gray-400 disabled:cursor-not-allowed "
         >
           <svg
             className="w-3.5 h-3.5 me-2 rtl:rotate-180"
@@ -36,7 +36,7 @@ function Pagination({ pageNumber, paginationStep, totalCount, currentDataCount, 
             setPage(pageNumber + 1);
           }}
           disabled={currentDataCount < paginationStep || (pageNumber + 1) * paginationStep === totalCount}
-          className="flex items-center justify-center px-4 h-10 text-base font-medium text-white disabled:hover:text-white bg-gray-800 disabled:hover:bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 disabled:dark:hover:bg-gray-800 dark:hover:text-white disabled:dark:hover:text-gray-400 disabled:cursor-not-allowed "
+          className="flex items-center justify-center px-4 h-10 text-base font-medium text-white disabled:hover:text-white bg-gray-200 dark:bg-slate-800  disabled:hover:bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900  dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 disabled:dark:hover:bg-gray-800 dark:hover:text-white disabled:dark:hover:text-gray-400 disabled:cursor-not-allowed "
         >
           Next
           <svg

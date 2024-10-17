@@ -27,6 +27,9 @@ export async function getRecentActivities(count = 10) {
 }
 
 export async function deleteActivity(id) {
+  const authUser = await supabase.auth.getUser();
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
   let { error } = await supabase.from("logs").delete().eq("id", id);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));

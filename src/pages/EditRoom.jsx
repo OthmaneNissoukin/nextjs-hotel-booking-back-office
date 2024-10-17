@@ -30,7 +30,7 @@ function EditRoom() {
       query.invalidateQueries(["roomsEdit"]);
       toast.success("Room has been updated successfully!");
     },
-    onError: (err) => toast.error("Failed to update!"),
+    onError: (err) => toast.error(err.message),
   });
 
   function onSubmitForm(data) {
@@ -134,12 +134,11 @@ function EditRoom() {
               type="number"
               defaultValue={room.price}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              {...register("price", { min: 25, max: 200, required: true })}
+              {...register("price", { min: 25, required: true })}
             />
             {errors.price?.type === "min" && (
               <p className="text-sm text-red-700 italic">Price must be greater than 25</p>
             )}
-            {errors.price?.type === "max" && <p className="text-sm text-red-700 italic">Price cannot exceed 200</p>}
             {errors.price?.type === "required" && <p className="text-sm text-red-700 italic">Price is required</p>}
           </div>
           <div className="flex flex-col gap-2 grow">

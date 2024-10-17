@@ -14,9 +14,6 @@ function DropdownProfile({ align }) {
       const authUser = await supabase.auth.getUser();
 
       setAuthenticatedUser(authUser);
-
-      console.log("authUser");
-      console.log(authUser);
     }
 
     getAuthUser();
@@ -70,7 +67,7 @@ function DropdownProfile({ align }) {
           <img className="w-8 h-8 rounded-full" src={UserAvatar} width="32" height="32" alt="User" />
           <div className="flex items-center truncate">
             <span className="truncate ml-2 text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 dark:group-hover:text-white">
-              {authenticatedUser?.data.user.is_anonymous ? "Anonymous" : "Admin"}
+              {!authenticatedUser?.data.user.is_anonymous ? "Admin" : "Anonymous"}
             </span>
 
             <svg className="w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500" viewBox="0 0 12 12">

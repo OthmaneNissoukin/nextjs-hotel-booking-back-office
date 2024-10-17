@@ -3,7 +3,6 @@ import supabase from "./db";
 
 export async function getAllRooms(from, to, filter = null) {
   let query = supabase.from("rooms").select("*, reservations(id,start_date, end_date, status)", { count: "exact" });
-
   // if (filter) query = query.order(filter.col, { ascending: filter.ascending });
 
   if (from !== undefined && to !== undefined) {
@@ -38,6 +37,10 @@ export async function getRoomImages(id) {
 }
 
 export async function createRoom(roomObj, roomThumbnail, roomImages) {
+  const authUser = await supabase.auth.getUser();
+
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
   const thumbnailName = `${new Date().getTime()}`;
   const { data: thumbnail, error: thumbnailError } = await supabase.storage
     .from("rooms-imgs")
@@ -104,6 +107,9 @@ export async function createRoom(roomObj, roomThumbnail, roomImages) {
 }
 
 export async function deleteRoom(id) {
+  const authUser = await supabase.auth.getUser();
+
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
   const { data: room, error } = await supabase.from("rooms").delete().eq("id", id).select();
 
   if (error || !room.length) {
@@ -112,6 +118,9 @@ export async function deleteRoom(id) {
 }
 
 export async function updateRoom(id, roomObj, roomThumbnail, roomImages) {
+  const authUser = await supabase.auth.getUser();
+
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
   console.log(roomThumbnail);
   const thumbnailName = `${new Date().getTime()}`;
   if (roomThumbnail) {
