@@ -7,6 +7,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "./LoadingSpinner";
 
 import { ModalContext } from "./Modal";
+import { createPortal } from "react-dom";
 
 function DeletionModal({ targetName, mutationFuntion, queryKey }) {
   const { close } = useContext(ModalContext);
@@ -21,8 +22,9 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
       toast.success(`${targetName} has been deleted!`);
     },
     onError: (err) => {
-      close();
-      toast.error(`Failed to delete!`);
+      toast.error(err.message);
+      console.log(err.message);
+      // close();
     },
   });
 
@@ -41,7 +43,7 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
       </Modal.ToggleOpen>
       <Modal.Overlay>
         <Modal.Wrapper>
-          <div className="w-[90%] max-w-[620px] p-5 mt-5 bg-slate-900 rounded-sm mx-auto">
+          <div className="w-[90%] max-w-[620px] p-5 mt-5 bg-gray-200 dark:bg-slate-900 rounded-sm mx-auto">
             <h2 className="text-2xl">Delete {targetName}</h2>
             <p className="mb-10 text-sm">This action cannot be undone. Are you sure to delete this item?</p>
             <div className="flex justify-end items-center gap-3">
@@ -65,7 +67,7 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
           </div>
         </Modal.Wrapper>
       </Modal.Overlay>
-      <Toaster position="top-center" />
+      {createPortal(<Toaster position="top-center" />, document.body)}
     </>
   );
 }

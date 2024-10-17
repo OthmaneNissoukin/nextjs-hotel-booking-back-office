@@ -41,6 +41,11 @@ function NewReservation() {
     );
   }, [selectedRoom]);
 
+  useEffect(() => {
+    setValue("guestID", selectedGuest);
+    setValue("roomID", selectedRoom);
+  }, [selectedGuest, selectedRoom]);
+
   const navigate = useNavigate();
   const {
     register,
@@ -73,7 +78,7 @@ function NewReservation() {
       toast.success("Reservation has been created");
     },
     onError: (err) => {
-      toast.error("Failed to submit!");
+      toast.error(err.message);
       console.log(err);
     },
   });

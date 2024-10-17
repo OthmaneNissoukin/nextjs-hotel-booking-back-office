@@ -30,6 +30,9 @@ export async function getGuestByEmail(email) {
 }
 
 export async function updateGuest(id, guest) {
+  const authUser = await supabase.auth.getUser();
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
   const { data, error } = await supabase.from("guests").update(guest).eq("id", id).select();
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -44,6 +47,9 @@ export async function updateGuest(id, guest) {
 }
 
 export async function createGuest(guest) {
+  const authUser = await supabase.auth.getUser();
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
   const { data, error } = await supabase.from("guests").insert([guest]).select();
 
   if (error) {
@@ -56,6 +62,9 @@ export async function createGuest(guest) {
 }
 
 export async function deleteGuest(guestID) {
+  const authUser = await supabase.auth.getUser();
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
   const { data, error } = await supabase.from("guests").delete().eq("id", guestID).select();
   console.log(guestID);
   console.log(data);

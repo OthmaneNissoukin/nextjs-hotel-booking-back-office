@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import SelectCountry from "../components/CountrySelector";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useEffect } from "react";
 
 function EditGuest() {
   const { id } = useParams();
@@ -19,8 +20,15 @@ function EditGuest() {
     register,
     formState: { errors },
     handleSubmit,
+    getValues,
+    setValue,
     reset,
   } = useForm();
+
+  useEffect(() => {
+    const values = getValues();
+    if (!values?.nationality && guest) setValue("nationality", guest.nationality);
+  }, [isLoading]);
 
   const { mutate, isPending: isSubmitting } = useMutation({
     mutationFn: async (data) => await updateGuest(id, data),
@@ -29,7 +37,7 @@ function EditGuest() {
       toast.success("Guest has been updated");
     },
     onError: (err) => {
-      toast.error("Failed to update guest");
+      toast.error(err.message);
     },
   });
 

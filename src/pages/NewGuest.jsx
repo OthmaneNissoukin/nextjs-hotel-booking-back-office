@@ -22,8 +22,8 @@ function NewGuest() {
       reset();
       navigate("/guests");
     },
-    onError: () => {
-      toast.error("Failed to create guest");
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
