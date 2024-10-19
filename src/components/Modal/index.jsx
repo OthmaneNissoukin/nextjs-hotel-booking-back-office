@@ -24,7 +24,12 @@ function Modal({ children }) {
 function ToggleOpen({ children }) {
   const { open } = useContext(ModalContext);
 
-  return cloneElement(children, { onClick: () => open() });
+  return cloneElement(children, {
+    onClick: () => {
+      open();
+      console.log(children.props?.handleClick?.());
+    },
+  });
 }
 
 function ToggleClose({ children }) {

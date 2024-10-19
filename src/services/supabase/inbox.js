@@ -16,9 +16,29 @@ export async function getAllMessages(from, to, limit, search) {
 
   const { data: messages, count, error } = await query;
 
-  if (error) console.log(error);
+  if (error) {
+    console.log(error);
+    throw new Error(error);
+  }
 
   return { messages, count };
+}
+
+export async function getMostRecentUnreadMessages(limit = 3) {
+  const {
+    data: messages,
+    count,
+    error,
+  } = await supabase.from("inbox").select("*").order("id", { ascending: false }).limit(limit);
+
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  if (error) {
+    console.log(error);
+    throw new Error(error);
+  }
+
+  return messages;
 }
 
 export async function deleteMessageByID(id) {

@@ -1,23 +1,21 @@
-import { Link } from "react-router-dom";
 import DeletionModal from "./DeletionModal";
 import Table from "./Table/Table";
 import { format, isToday, isYesterday } from "date-fns";
-import { deleteMessageByID, getAllMessages, markMessageAsRead } from "../services/supabase/inbox";
+import { deleteMessageByID, getAllMessages } from "../services/supabase/inbox";
 import Pagination from "./Pagination";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import TableSkeleton from "./TableSkeleton";
 import { PAGINATION_STEP } from "../utils/Utils";
 import Modal from "./Modal";
+import MarkAsReadBtn from "./MarkAsReadBtn";
+import DropdownEditMenu from "./DropdownEditMenu";
+import ReadMore from "./ReadMore";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckDouble } from "@fortawesome/free-solid-svg-icons";
-
-import { useOptimistic } from "react";
 
 function InboxTable({ headings, search }) {
   const [page, setPage] = useState(0);
-  const queryCilent = useQueryClient();
-  const { mutate: mutateMessage } = useMutation({ mutationFn: async (id) => await markMessageAsRead(id) });
 
   const {
     data: { messages, count } = {},
@@ -28,18 +26,6 @@ function InboxTable({ headings, search }) {
     queryKey: ["inbox", page, search],
     queryFn: async () => getAllMessages(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP, undefined, search),
   });
-
-  const z = useOptimistic(messages, (state, messageID) =>
-    state.map((item) => (item.id === messageID ? { ...item, is_read: true } : item))
-  );
-
-  console.log(z);
-  return <h1>TEST</h1>;
-
-  async function handleMarkAsRead(messageID) {
-    markOpitimisticMessage(messageID);
-    mutateMessage(messageID);
-  }
 
   let indexStartingFrom = page * PAGINATION_STEP + 1;
 
@@ -54,12 +40,12 @@ function InboxTable({ headings, search }) {
       <div className="flex flex-col">
         <div className="-m-1.5 overflow-x-auto">
           <div className="p-1.5 min-w-full inline-block align-middle">
-            <div className="overflow-hidden">
+            <div className="">
               <Modal>
                 <Table>
                   <Table.Head headings={headings} />
 
-                  {optimisticMessages?.map((item, index) => (
+                  {messages?.map((item, index) => (
                     <Table.Row>
                       {headings.find((col) => col.label === "#" && col.show) && (
                         <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
@@ -113,20 +99,30 @@ function InboxTable({ headings, search }) {
 
                       {headings.find((col) => col.label === "actions" && col.show) && (
                         <Table.Cell>
-                          <button
-                            onClick={() => handleMarkAsRead(item.id)}
-                            class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
-                          >
-                            <span>
-                              <FontAwesomeIcon icon={faCheckDouble} />
-                            </span>{" "}
-                            <span>Mark as Read</span>
-                          </button>
-                          <DeletionModal
-                            queryKey={"inbox"}
-                            targetName={"The message"}
-                            mutationFuntion={async () => await deleteMessageByID(item.id)}
-                          />
+                          <DropdownEditMenu align="right" className="relative inline-flex">
+                            <li>
+                              <ReadMore message={item}>
+                                <button className="min-w-40 inline-flex w-full items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400 dark:focus:text-blue-400">
+                                  <span>
+                                    <FontAwesomeIcon icon={faEye} />
+                                  </span>{" "}
+                                  <span>Details</span>
+                                </button>
+                              </ReadMore>
+                            </li>
+                            {!item?.is_read && (
+                              <li>
+                                <MarkAsReadBtn id={item.id} />
+                              </li>
+                            )}
+                            <li>
+                              <DeletionModal
+                                queryKey={"inbox"}
+                                targetName={"The message"}
+                                mutationFuntion={async () => await deleteMessageByID(item.id)}
+                              />
+                            </li>
+                          </DropdownEditMenu>
                         </Table.Cell>
                       )}
                     </Table.Row>

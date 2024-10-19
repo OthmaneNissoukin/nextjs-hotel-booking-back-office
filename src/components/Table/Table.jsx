@@ -1,8 +1,6 @@
 export default function Table({ children }) {
   return (
-    <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 rounded-md overflow-hidden">
-      {children}
-    </table>
+    <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 rounded-md mt-2">{children}</table>
   );
 }
 

@@ -51,7 +51,7 @@ function DropdownEditMenu({ children, align, ...rest }) {
       <Transition
         show={dropdownOpen}
         tag="div"
-        className={`origin-top-right z-10 absolute bottom-0 min-w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1 ${
+        className={`origin-top-right z-10 absolute -bottom-5 min-w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1 rounded-lg shadow-lg overflow-auto mt-1 ${
           align === "right" ? "right-7" : "left-0"
         }`}
         enter="transition ease-out duration-200 transform"
