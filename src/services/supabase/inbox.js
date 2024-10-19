@@ -36,3 +36,19 @@ export async function deleteMessageByID(id) {
 
   return;
 }
+
+export async function markMessageAsRead(id) {
+  const authUser = await supabase.auth.getUser();
+  if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
+
+  let { error, data } = await supabase.from("inbox").update({ is_read: true }).eq("id", id);
+
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  if (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+
+  return data;
+}
