@@ -71,9 +71,6 @@ function InboxTable({ headings, search }) {
                         </Table.Cell>
                       )}
 
-                      {/* {headings.find((col) => col.label === "email" && col.show) && (
-                        <Table.Cell></Table.Cell>
-                      )} */}
                       {headings.find((col) => col.label === "phone" && col.show) && (
                         <Table.Cell>{item.phone}</Table.Cell>
                       )}
@@ -120,6 +117,7 @@ function InboxTable({ headings, search }) {
                                 queryKey={"inbox"}
                                 targetName={"The message"}
                                 mutationFuntion={async () => await deleteMessageByID(item.id)}
+                                modalKey={index}
                               />
                             </li>
                           </DropdownEditMenu>

@@ -12,6 +12,7 @@ import ReservationsTable from "../components/ReservationsTable";
 import FilterButton from "../components/DropdownFilter";
 import Pagination from "../components/Pagination";
 import { PAGINATION_STEP } from "../utils/Utils";
+import AddNewLink from "../components/AddNewLink";
 
 const tableHeadings = ["#", "room", "guest", "price", "booking range", "status", "actions"];
 
@@ -45,21 +46,15 @@ function Reservations() {
           <input
             type="text"
             placeholder="Search by guest name"
-            className="xs:w-auto text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 min-w-72"
+            className="w-full xs:w-auto text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 min-w-72 mb-5 xs:mb-0"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
         <div className="flex gap-5">
-          {/* <ColsControl headings={headings} setHeadings={setHeadings} /> */}
           <FilterButton headings={headings} setHeadings={setHeadings} align="right" />
-          <Link
-            to={"/reservations/new"}
-            className="inline-block no-underline w-full xs:w-auto text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-          >
-            Add New
-          </Link>
+          <AddNewLink link={"/reservations/new"} />
         </div>
       </div>
       <ReservationsTable search={search} headings={headings} />

@@ -3,7 +3,7 @@ import { deleteRoom, getAllRooms } from "../services/supabase/rooms";
 import DeletionModal from "./DeletionModal";
 import Table from "./Table/Table";
 import { useState } from "react";
-import { PAGINATION_STEP } from "../utils/Utils";
+import { isRoomAvailableNow, PAGINATION_STEP } from "../utils/Utils";
 import Pagination from "./Pagination";
 import Loader from "./Loader";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ import DropdownEditMenu from "./DropdownEditMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
+import Badge from "./Badge";
 
 function RoomsTable({ headings, filter }) {
   const [page, setPage] = useState(0);
@@ -52,22 +53,31 @@ function RoomsTable({ headings, filter }) {
                         </Table.Cell>
                       )}
 
-                      {headings.find((col) => col.label === "name" && col.show) && (
-                        <Table.Cell>{String(item.name).padStart(2, "0")}</Table.Cell>
+                      {headings.find((col) => col.label === "room" && col.show) && (
+                        <Table.Cell>
+                          <span>{String(item.name).padStart(2, "0")}</span> <br />
+                          <span className="italic font-extralight text-slate-500">
+                            ${item.price.toFixed(2)} per night
+                          </span>
+                        </Table.Cell>
                       )}
 
                       {headings.find((col) => col.label === "capacity" && col.show) && (
                         <Table.Cell>{String(item.capacity).padStart(2, "0")}</Table.Cell>
                       )}
-                      {headings.find((col) => col.label === "price" && col.show) && (
-                        <Table.Cell>${item.price.toFixed(2)}</Table.Cell>
-                      )}
+
                       {headings.find((col) => col.label === "discount" && col.show) && (
                         <Table.Cell>${item.discount.toFixed(2)}</Table.Cell>
                       )}
                       {headings.find((col) => col.label === "status" && col.show) && (
                         <Table.Cell>
-                          <Table.Cell>STATIC</Table.Cell>
+                          <Table.Cell>
+                            {isRoomAvailableNow(item.reservations) ? (
+                              <Badge status={"success"}>Available</Badge>
+                            ) : (
+                              <Badge status={"warning"}>Reserved</Badge>
+                            )}
+                          </Table.Cell>
                         </Table.Cell>
                       )}
                       {headings.find((col) => col.label === "actions" && col.show) && (
@@ -89,6 +99,7 @@ function RoomsTable({ headings, filter }) {
                                 queryKey={"rooms"}
                                 targetName={item.name}
                                 mutationFuntion={async () => await deleteRoom(item.id)}
+                                modalKey={index}
                               />
                             </li>
                           </DropdownEditMenu>

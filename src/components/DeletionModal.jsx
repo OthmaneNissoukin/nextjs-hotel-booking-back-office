@@ -9,7 +9,8 @@ import LoadingSpinner from "./LoadingSpinner";
 import { ModalContext } from "./Modal";
 import { createPortal } from "react-dom";
 
-function DeletionModal({ targetName, mutationFuntion, queryKey }) {
+function DeletionModal({ targetName, mutationFuntion, queryKey, modalKey }) {
+  // console.log(modalKey);
   const { close } = useContext(ModalContext);
   const closeRef = useRef(null);
   const queryClient = useQueryClient();
@@ -30,7 +31,7 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
 
   return (
     <>
-      <Modal.ToggleOpen>
+      <Modal.ToggleOpen modalKey={modalKey}>
         <button
           type="button"
           className="inline-flex w-full items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-800 focus:outline-none focus:text-red-800 disabled:opacity-50 disabled:pointer-events-none dark:text-red-500 dark:hover:text-red-400 dark:focus:text-red-400"
@@ -41,7 +42,8 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
           <span>Delete</span>
         </button>
       </Modal.ToggleOpen>
-      <Modal.Overlay>
+
+      <Modal.Overlay modalKey={modalKey}>
         <Modal.Wrapper>
           <div className="w-[90%] max-w-[620px] p-5 mt-5 bg-gray-200 dark:bg-slate-900 rounded-sm mx-auto">
             <h2 className="text-2xl">Delete {targetName}</h2>
@@ -67,6 +69,7 @@ function DeletionModal({ targetName, mutationFuntion, queryKey }) {
           </div>
         </Modal.Wrapper>
       </Modal.Overlay>
+
       {createPortal(<Toaster position="top-center" />, document.body)}
     </>
   );

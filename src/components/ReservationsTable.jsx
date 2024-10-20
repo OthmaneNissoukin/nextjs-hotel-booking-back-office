@@ -105,6 +105,7 @@ function ReservationsTable({ headings, search }) {
                                   queryKey={"reservations"}
                                   targetName={"The reservation"}
                                   mutationFuntion={async () => await deleteReservation(item.id, !!item.deleted_at)}
+                                  modalKey={index}
                                 />
                               </li>
                             )}

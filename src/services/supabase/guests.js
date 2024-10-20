@@ -15,7 +15,7 @@ export async function getAllGuests(from, to, search) {
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  const { data: guests, error, count } = await query;
+  const { data: guests, error, count } = await query.order("id", { ascending: false });
   if (error) console.log(error);
 
   return { guests, count };

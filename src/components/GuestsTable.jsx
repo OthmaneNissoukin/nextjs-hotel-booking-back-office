@@ -11,8 +11,10 @@ import DropdownEditMenu from "./DropdownEditMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
+import Badge from "./Badge";
 function GuestsTable({ tableHeadings = [], search }) {
   const [page, setPage] = useState(0);
+  const [activeModal, setActiveModal] = useState(null);
   const {
     data: { guests, count } = {},
     isLoading,
@@ -42,25 +44,25 @@ function GuestsTable({ tableHeadings = [], search }) {
                   <Table.Head headings={tableHeadings} />
 
                   {guests.map((item, index) => (
-                    <Table.Row>
+                    <Table.Row key={index}>
                       {tableHeadings.find((col) => col.label === "#" && col.show === true) && (
                         <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
                       )}
 
-                      {tableHeadings.find((col) => col.label === "Fullname" && col.show === true) && (
-                        <Table.Cell>{item.fullname}</Table.Cell>
+                      {tableHeadings.find((col) => col.label === "Guest" && col.show === true) && (
+                        <Table.Cell>
+                          <span>{item?.fullname}</span>
+                          {item?.nationalID && <br />}
+                          <span className="italic font-extralight text-slate-500">{item?.nationalID}</span>{" "}
+                        </Table.Cell>
                       )}
 
-                      {tableHeadings.find((col) => col.label === "NationalID" && col.show === true) && (
-                        <Table.Cell>{item.nationalID ? item.nationalID : "- - - -"}</Table.Cell>
-                      )}
-
-                      {tableHeadings.find((col) => col.label === "Email" && col.show === true) && (
-                        <Table.Cell>{item.email}</Table.Cell>
-                      )}
-
-                      {tableHeadings.find((col) => col.label === "Phone" && col.show === true) && (
-                        <Table.Cell>{item.phone ? item.phone : "- - - -"}</Table.Cell>
+                      {tableHeadings.find((col) => col.label === "Contacts" && col.show === true) && (
+                        <Table.Cell>
+                          <span>{item?.email}</span>
+                          {item?.phone && <br />}
+                          <span className="italic font-extralight text-slate-500">{item?.phone}</span>{" "}
+                        </Table.Cell>
                       )}
 
                       {tableHeadings.find((col) => col.label === "Nationality" && col.show === true) && (
@@ -74,6 +76,16 @@ function GuestsTable({ tableHeadings = [], search }) {
                             </div>
                           ) : (
                             "- - - -"
+                          )}
+                        </Table.Cell>
+                      )}
+
+                      {tableHeadings.find((col) => col.label === "Profile" && col.show === true) && (
+                        <Table.Cell>
+                          {!(item?.phone && item?.email && item?.nationality && item?.nationalID) ? (
+                            <Badge status={"warning"}>Incomplete</Badge>
+                          ) : (
+                            <Badge status={"success"}>Completed</Badge>
                           )}
                         </Table.Cell>
                       )}
@@ -97,6 +109,7 @@ function GuestsTable({ tableHeadings = [], search }) {
                                 queryKey={"guests"}
                                 targetName={item.fullname}
                                 mutationFuntion={async () => deleteGuest(item.id)}
+                                modalKey={index}
                               />
                             </li>
                           </DropdownEditMenu>

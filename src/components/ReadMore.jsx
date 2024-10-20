@@ -4,9 +4,9 @@ import { format } from "date-fns";
 function ReadMore({ message, children }) {
   return (
     <Modal>
-      <Modal.ToggleOpen>{children}</Modal.ToggleOpen>
+      <Modal.ToggleOpen modalKey={message.id}>{children}</Modal.ToggleOpen>
 
-      <Modal.Overlay>
+      <Modal.Overlay modalKey={message.id}>
         <Modal.Wrapper>
           <div className="bg-gray-800 mx-auto my-5 overflow-auto rounded-lg shadow-lg w-11/12 md:w-3/5 lg:w-2/5 p-6 relative">
             <Modal.ToggleClose>

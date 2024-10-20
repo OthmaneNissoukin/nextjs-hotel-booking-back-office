@@ -1,5 +1,6 @@
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfigFile from "@tailwindConfig";
+import { isBefore, isAfter, isToday } from "date-fns";
 
 export const tailwindConfig = () => {
   return resolveConfig(tailwindConfigFile);
@@ -47,6 +48,16 @@ export const formatCountry = (nationality) => {
 
 export const generateSlug = (str) => {
   return str.toLowerCase().split(" ").join("-");
+};
+
+export const isRoomAvailableNow = (reservations) => {
+  console.log(reservations);
+  return !reservations?.find(
+    (reservation) =>
+      isToday(reservation.start_date) ||
+      isToday(reservation.end_date) ||
+      (isBefore(reservation.start_date, new Date()) && isAfter(reservation.end_date, new Date()))
+  );
 };
 
 export const PAGINATION_STEP = 5;

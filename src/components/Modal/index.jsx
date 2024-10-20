@@ -9,7 +9,11 @@ function escListener(e, close) {
 
 function Modal({ children }) {
   const [isOpen, setIsOpen] = useState(false);
-  const open = () => setIsOpen(true);
+  const [activeModal, setActiveModal] = useState(null);
+  const open = (key) => {
+    setIsOpen(true);
+    setActiveModal(key);
+  };
   const close = () => setIsOpen(false);
 
   useEffect(() => {
@@ -18,16 +22,16 @@ function Modal({ children }) {
     return () => document.removeEventListener("keyup", (e) => escListener(e, close));
   }, []);
 
-  return <ModalContext.Provider value={{ open, close, isOpen }}>{children}</ModalContext.Provider>;
+  return <ModalContext.Provider value={{ open, close, isOpen, activeModal }}>{children}</ModalContext.Provider>;
 }
 
-function ToggleOpen({ children }) {
+function ToggleOpen({ children, modalKey }) {
   const { open } = useContext(ModalContext);
 
   return cloneElement(children, {
     onClick: () => {
-      open();
-      console.log(children.props?.handleClick?.());
+      open(modalKey);
+      children.props?.handleClick?.();
     },
   });
 }
@@ -42,11 +46,11 @@ function ToggleClose({ children }) {
   });
 }
 
-function Overlay({ children }) {
-  const { isOpen } = useContext(ModalContext);
-  if (!isOpen) return;
+function Overlay({ children, modalKey }) {
+  const { isOpen, activeModal } = useContext(ModalContext);
+  if (isOpen && modalKey == activeModal) return createPortal(children, document.body);
 
-  return createPortal(children, document.body);
+  return;
 }
 
 function Wrapper({ children }) {

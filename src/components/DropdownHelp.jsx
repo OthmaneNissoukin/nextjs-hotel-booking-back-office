@@ -73,14 +73,27 @@ function DropdownHelp({ align }) {
             <li>
               <Link
                 className="font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1 px-3"
-                to="#0"
+                to="https://github.com/OthmaneNissoukin/nextjs-hotel-booking-back-office"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 <svg className="w-3 h-3 fill-current text-violet-500 shrink-0 mr-2" viewBox="0 0 12 12">
                   <rect y="3" width="12" height="9" rx="1" />
                   <path d="M2 0h8v2H2z" />
                 </svg>
-                <span>Documentation</span>
+                <span>Source Code</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1 px-3"
+                to="https://nextjs-hotel-booking-five.vercel.app/"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                <svg className="w-3 h-3 fill-current text-violet-500 shrink-0 mr-2" viewBox="0 0 12 12">
+                  <rect y="3" width="12" height="9" rx="1" />
+                  <path d="M2 0h8v2H2z" />
+                </svg>
+                <span>Front Office</span>
               </Link>
             </li>
           </ul>
