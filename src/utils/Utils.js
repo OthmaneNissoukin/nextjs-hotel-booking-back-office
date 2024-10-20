@@ -60,4 +60,24 @@ export const isRoomAvailableNow = (reservations) => {
   );
 };
 
+export const currentReservationStatus = (reservation) => {
+  if (reservation.status === "unconfirmed" && !isAfter(new Date(), reservation.start_date))
+    return { type: "warning", status: "Unconfirmed" };
+  else if (
+    reservation.status === "cancelled" ||
+    (reservation.status === "unconfirmed" && isAfter(new Date(), reservation.start_date))
+  )
+    return { type: "danger", status: "Cancelled" };
+  else if (
+    isToday(reservation.start_date) ||
+    isToday(reservation.end_date) ||
+    (isBefore(reservation.start_date, new Date()) && isAfter(reservation.end_date, new Date()))
+  ) {
+    return { type: "success", status: "On Going" };
+  } else if (isAfter(new Date(), reservation.end_date)) return { type: "secondary", status: "Passed" };
+  else if ((reservation.status = "confirmed")) return { type: "success", status: "Confirmed" };
+
+  return { type: "danger", status: "Unknown" };
+};
+
 export const PAGINATION_STEP = 5;

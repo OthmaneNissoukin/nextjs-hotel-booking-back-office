@@ -2,13 +2,19 @@ const Badge = ({ status, children }) => {
   const getColorClasses = (status) => {
     switch (status) {
       case "success":
-        return "text-green-800 bg-green-100 border-green-300 dark:text-green-200 dark:bg-green-900 dark:border-green-700";
+        return "text-green-800 bg-green-200 border-green-400 dark:text-green-100 dark:bg-green-700 dark:border-green-600";
       case "warning":
-        return "text-yellow-800 bg-yellow-100 border-yellow-300 dark:text-yellow-200 dark:bg-yellow-900 dark:border-yellow-700";
+        return "text-yellow-800 bg-yellow-200 border-yellow-400 dark:text-yellow-100 dark:bg-yellow-700 dark:border-yellow-600";
       case "danger":
-        return "text-red-800 bg-red-100 border-red-300 dark:text-red-200 dark:bg-red-900 dark:border-red-700";
+        return "text-red-800 bg-red-200 border-red-400 dark:text-red-100 dark:bg-red-700 dark:border-red-600";
+      case "secondary":
+        return "text-purple-800 bg-purple-200 border-purple-400 dark:text-purple-100 dark:bg-purple-700 dark:border-purple-600";
+      case "info":
+        return "text-blue-800 bg-blue-200 border-blue-400 dark:text-blue-100 dark:bg-blue-700 dark:border-blue-600";
+      case "neutral":
+        return "text-gray-800 bg-gray-200 border-gray-400 dark:text-gray-100 dark:bg-gray-700 dark:border-gray-600";
       default:
-        return "text-gray-800 bg-gray-100 border-gray-300 dark:text-gray-200 dark:bg-gray-900 dark:border-gray-700";
+        return "text-gray-800 bg-gray-200 border-gray-400 dark:text-gray-100 dark:bg-gray-700 dark:border-gray-600";
     }
   };
 

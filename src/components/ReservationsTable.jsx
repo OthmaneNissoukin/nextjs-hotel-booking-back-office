@@ -6,13 +6,14 @@ import { deleteReservation, getAllReservation } from "../services/supabase/reser
 import { differenceInDays, format, isAfter, isBefore } from "date-fns";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { PAGINATION_STEP } from "../utils/Utils";
+import { currentReservationStatus, PAGINATION_STEP } from "../utils/Utils";
 import Pagination from "./Pagination";
 import TableSkeleton from "./TableSkeleton";
 import DropdownEditMenu from "./DropdownEditMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
+import Badge from "./Badge";
 
 function ReservationsTable({ headings, search }) {
   const [page, setPage] = useState(0);
@@ -49,19 +50,28 @@ function ReservationsTable({ headings, search }) {
                         <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
                       )}
 
-                      {headings.find((col) => col.label === "room" && col.show) && (
-                        <Table.Cell>{String(item.rooms?.name)}</Table.Cell>
-                      )}
-
                       {headings.find((col) => col.label === "guest" && col.show) && (
                         <Table.Cell>
-                          {String(item.guests?.fullname ? item.guests?.fullname : item?.guest_fullname)}
-                          {!item.guest_id && <span className="text-xs text-red-800 italic">left</span>}
+                          {item.guests?.fullname ? item.guests?.fullname : item?.guest_fullname}
+                          {!item.guest_id && (
+                            <>
+                              <br />
+                              <span className="text-xs text-red-800 italic">profile deleted</span>
+                            </>
+                          )}
                         </Table.Cell>
                       )}
-                      {headings.find((col) => col.label === "price" && col.show) && (
-                        <Table.Cell>${item.reserved_price.toFixed(2)}</Table.Cell>
+
+                      {headings.find((col) => col.label === "room" && col.show) && (
+                        <Table.Cell>
+                          <span>{item.rooms?.name}</span>
+                          <br />
+                          <span className="italic font-extralight text-slate-500">
+                            Booked for ${item.reserved_price.toFixed(2)}
+                          </span>
+                        </Table.Cell>
                       )}
+
                       {headings.find((col) => col.label === "booking range" && col.show) && (
                         <Table.Cell>
                           {format(item.start_date, "LLL dd yyyy")} &ndash; {format(item.end_date, "LLL dd yyyy")}
@@ -73,7 +83,11 @@ function ReservationsTable({ headings, search }) {
                       )}
 
                       {headings.find((col) => col.label === "status" && col.show) && (
-                        <Table.Cell>{item.status}</Table.Cell>
+                        <Table.Cell>
+                          <Badge status={currentReservationStatus(item)?.type}>
+                            {currentReservationStatus(item)?.status}
+                          </Badge>
+                        </Table.Cell>
                       )}
                       {headings.find((col) => col.label === "actions" && col.show) && (
                         <Table.Cell>

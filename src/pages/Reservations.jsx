@@ -14,7 +14,7 @@ import Pagination from "../components/Pagination";
 import { PAGINATION_STEP } from "../utils/Utils";
 import AddNewLink from "../components/AddNewLink";
 
-const tableHeadings = ["#", "room", "guest", "price", "booking range", "status", "actions"];
+const tableHeadings = ["#", "guest", "room", "booking range", "status", "actions"];
 
 // const tempReservations = [
 //   {

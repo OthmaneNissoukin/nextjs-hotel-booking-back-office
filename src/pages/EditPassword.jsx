@@ -41,7 +41,7 @@ function EditPassword() {
         <div className="grid md:grid-cols-2 gap-5">
           {/* PASSWORD */}
           <div>
-            <label>Password</label>
+            <label className="inline-block mb-2">Password</label>
             <div className="flex rounded-lg shadow-sm">
               <input
                 type={showPassword ? "text" : "password"}
@@ -67,7 +67,7 @@ function EditPassword() {
 
           {/* PASSWORD CONFIRMATION */}
           <div>
-            <label>Confirm Password</label>
+            <label className="inline-block mb-2">Confirm Password</label>
             <div className="flex rounded-lg shadow-sm">
               <input
                 type={showPassword ? "text" : "password"}
