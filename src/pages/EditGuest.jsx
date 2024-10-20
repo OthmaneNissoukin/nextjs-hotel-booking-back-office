@@ -6,6 +6,7 @@ import SelectCountry from "../components/CountrySelector";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useEffect } from "react";
+import FormSkeleton from "../components/FormSkeleton";
 
 function EditGuest() {
   const { id } = useParams();
@@ -50,7 +51,7 @@ function EditGuest() {
     mutate(data);
   }
 
-  if (isLoading) return "Loading Guest...";
+  if (isLoading) return <FormSkeleton />;
   if (error) return "Error occured !!!";
 
   if (!guest) return "Guest not found!";

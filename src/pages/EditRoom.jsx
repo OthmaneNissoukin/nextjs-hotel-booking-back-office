@@ -4,6 +4,7 @@ import { getRoomById, updateRoom } from "../services/supabase/rooms";
 import toast, { Toaster } from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import FormSkeleton from "../components/FormSkeleton";
 
 function EditRoom() {
   const { id } = useParams();
@@ -40,7 +41,7 @@ function EditRoom() {
     mutate(data);
   }
 
-  if (isLoading) return <h1>Loading...</h1>;
+  if (isLoading) return <FormSkeleton />;
   if (error) {
     console.log(error);
     return <h1>Error occured</h1>;

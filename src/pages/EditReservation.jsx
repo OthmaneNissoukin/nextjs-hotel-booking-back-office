@@ -10,6 +10,7 @@ import { areIntervalsOverlapping, isBefore, subDays, isAfter } from "date-fns";
 import toast, { Toaster } from "react-hot-toast";
 import { getReservationByID, updateReseration } from "../services/supabase/reservations";
 import LoadingSpinner from "../components/LoadingSpinner";
+import FormSkeleton from "../components/FormSkeleton";
 
 function EditReservation() {
   const { id: reservationID } = useParams();
@@ -133,7 +134,7 @@ function EditReservation() {
     // setBookingPeriod(value);
   }
 
-  if (isLoadingReservation || isLoadingRooms) return <h1>Please wait...</h1>;
+  if (isLoadingReservation || isLoadingRooms) return <FormSkeleton />;
 
   if (isReservationError || isRoomsError) return <h1>Error occured!</h1>;
 

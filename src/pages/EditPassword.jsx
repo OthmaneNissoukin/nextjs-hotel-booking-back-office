@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -9,6 +9,7 @@ import { updateUserPwd } from "../services/supabase/user";
 
 function EditPassword() {
   const [showPassword, setShowPassword] = useState(false);
+  const clientQuery = useQueryClient();
 
   const {
     register,
@@ -18,8 +19,10 @@ function EditPassword() {
   } = useForm();
 
   const { mutate, isPending } = useMutation({
+    mutationKey: ["user"],
     mutationFn: async (newPwd) => await updateUserPwd(newPwd),
     onSuccess: () => {
+      clientQuery.invalidateQueries(["user"]);
       reset();
       toast.success("Password has been updated successfully!");
     },

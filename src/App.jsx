@@ -23,6 +23,7 @@ import Login from "./pages/Login";
 import Inbox from "./pages/Inbox";
 import Logs from "./pages/Logs";
 import EditPassword from "./pages/EditPassword";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   const location = useLocation();
@@ -72,6 +73,7 @@ function App() {
           <Route exact path="/inbox" element={<Inbox />} />
           <Route exact path="/activities" element={<Logs />} />
           <Route exact path="/account/edit-password" element={<EditPassword />} />
+          <Route exact path="/account/edit-profile" element={<EditProfile />} />
         </Route>
       </Routes>
     </>

@@ -97,20 +97,13 @@ function Login() {
                 </button>
                 <button
                   onClick={authAnounymous}
-                  // onClick={() =>
-                  //   toast.promise(authAnounymous, {
-                  //     loading: "Please Wait...",
-                  //     success: "You are signed in",
-                  //     error: "Failed to authenticate",
-                  //   })
-                  // }
                   type="button"
                   className="w-full text-white min-w-32 bg-stone-600 hover:bg-stone-700 focus:ring-4 focus:outline-none focus:ring-stone-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-stone-600 dark:hover:bg-stone-700 dark:focus:ring-stone-800 disabled:cursor-not-allowed"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
                     <>
-                      <FontAwesomeIcon icon={faBan} spinPulse /> <span>Sign In as Anonymous</span>
+                      <FontAwesomeIcon icon={faBan} /> <span>Sign In as Anonymous</span>
                     </>
                   ) : (
                     "Sign In as Anonymous"
