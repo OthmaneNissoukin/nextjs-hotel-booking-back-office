@@ -22,6 +22,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import Login from "./pages/Login";
 import Inbox from "./pages/Inbox";
 import Logs from "./pages/Logs";
+import EditPassword from "./pages/EditPassword";
 
 function App() {
   const location = useLocation();
@@ -70,6 +71,7 @@ function App() {
           <Route exact path="/reservations/edit/:id" element={<EditReservation />} />
           <Route exact path="/inbox" element={<Inbox />} />
           <Route exact path="/activities" element={<Logs />} />
+          <Route exact path="/account/edit-password" element={<EditPassword />} />
         </Route>
       </Routes>
     </>

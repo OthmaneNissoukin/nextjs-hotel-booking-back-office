@@ -5,7 +5,9 @@ import DoughnutChart from "../../charts/DoughnutChart";
 import { tailwindConfig } from "../../utils/Utils";
 
 function TopCountriesCard({ guests }) {
-  const groupedGuests = Object.groupBy(guests, ({ nationality }) => nationality);
+  const guestsWithNationalities = guests.filter((item) => item.nationality);
+
+  const groupedGuests = Object.groupBy(guestsWithNationalities, ({ nationality }) => nationality);
 
   let countries = Object.keys(groupedGuests).reduce((curr, next) => {
     curr[next] = 0;
@@ -13,15 +15,19 @@ function TopCountriesCard({ guests }) {
   }, {});
 
   guests.forEach((guest) => {
-    countries[guest.nationality]++;
+    const nationality = guest.nationality;
+    if (nationality && countries[nationality] !== undefined) {
+      countries[nationality]++;
+    }
   });
 
+  console.log(countries);
   countries = Object.entries(countries).sort(([, a], [, b]) => b - a);
-  countries.length = 5;
+  countries.length = countries.length > 4 ? 5 : countries.length;
   countries = countries.filter(Boolean);
 
   const chartData = {
-    labels: countries.map((item) => item),
+    labels: countries.map((item) => item ?? "Other"),
     datasets: [
       {
         label: "Top Countries",

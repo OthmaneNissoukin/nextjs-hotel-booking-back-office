@@ -79,6 +79,7 @@ function LogsTable({ headings, search }) {
                             queryKey={"logs"}
                             targetName={"The activity"}
                             mutationFuntion={async () => await deleteActivity(item.id)}
+                            modalKey={index}
                           />
                         </Table.Cell>
                       )}

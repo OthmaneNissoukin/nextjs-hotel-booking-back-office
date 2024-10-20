@@ -63,9 +63,10 @@ export async function createGuest(guest) {
 
 export async function deleteGuest(guestID) {
   const authUser = await supabase.auth.getUser();
+  console.log(guestID);
   if (authUser?.data.user?.is_anonymous) throw new Error("Action can't be performed as an anonymous user!");
 
-  const { data, error } = await supabase.from("guests").delete().eq("id", guestID).select();
+  const { data, error } = await supabase.from("guests").delete().eq("id", guestID);
   console.log(guestID);
   console.log(data);
 
