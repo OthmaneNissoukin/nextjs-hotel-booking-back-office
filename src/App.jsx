@@ -24,6 +24,7 @@ import Inbox from "./pages/Inbox";
 import Logs from "./pages/Logs";
 import EditPassword from "./pages/EditPassword";
 import EditProfile from "./pages/EditProfile";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const location = useLocation();
@@ -60,21 +61,22 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route exact path="/" element={<Dashboard />} />
-          <Route exact path="/dashboard" element={<Dashboard />} />
-          <Route exact path="/rooms" element={<Rooms />} />
-          <Route exact path="/rooms/new" element={<NewRoom />} />
-          <Route exact path="/rooms/edit/:id" element={<EditRoom />} />
-          <Route exact path="/guests" element={<Guests />} />
-          <Route exact path="/guests/new" element={<NewGuest />} />
-          <Route exact path="/guests/edit/:id" element={<EditGuest />} />
-          <Route exact path="/reservations" element={<Reservations />} />
-          <Route exact path="/reservations/new" element={<NewReservation />} />
-          <Route exact path="/reservations/edit/:id" element={<EditReservation />} />
-          <Route exact path="/inbox" element={<Inbox />} />
-          <Route exact path="/activities" element={<Logs />} />
-          <Route exact path="/account/edit-password" element={<EditPassword />} />
-          <Route exact path="/account/edit-profile" element={<EditProfile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/rooms" element={<Rooms />} />
+          <Route path="/rooms/new" element={<NewRoom />} />
+          <Route path="/rooms/edit/:id" element={<EditRoom />} />
+          <Route path="/guests" element={<Guests />} />
+          <Route path="/guests/new" element={<NewGuest />} />
+          <Route path="/guests/edit/:id" element={<EditGuest />} />
+          <Route path="/reservations" element={<Reservations />} />
+          <Route path="/reservations/new" element={<NewReservation />} />
+          <Route path="/reservations/edit/:id" element={<EditReservation />} />
+          <Route path="/inbox" element={<Inbox />} />
+          <Route path="/activities" element={<Logs />} />
+          <Route path="/account/edit-password" element={<EditPassword />} />
+          <Route path="/account/edit-profile" element={<EditProfile />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
