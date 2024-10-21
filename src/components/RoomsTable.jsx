@@ -118,7 +118,7 @@ function RoomsTable({ headings, filter }) {
       <Pagination
         pageNumber={page}
         setPage={setPage}
-        currentDataCount={rooms?.length == 0}
+        currentDataCount={rooms?.length ?? 0}
         totalCount={count}
         paginationStep={PAGINATION_STEP}
       />

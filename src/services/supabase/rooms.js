@@ -92,6 +92,8 @@ export async function createRoom(roomObj, roomThumbnail, roomImages) {
       .insert(createdGallery)
       .select();
 
+    console.log({ data: roomGallery, error: galleryError });
+
     if (galleryError) galleryFlag = true;
   }
 
