@@ -94,7 +94,7 @@ function LogsTable({ headings, search }) {
       <Pagination
         pageNumber={page}
         totalCount={count}
-        currentDataCount={logs.length}
+        currentDataCount={logs?.length ?? 0}
         paginationStep={PAGINATION_STEP}
         setPage={setPage}
       />

@@ -31,7 +31,7 @@ function InboxTable({ headings, search }) {
 
   if (isLoading) return <TableSkeleton headings={headings.map((item) => item.label)} />;
 
-  if (isError) return <h1>{error.message}</h1>;
+  if (isError) return <h1>Failed to fetch messages</h1>;
 
   if (!messages) return <h1>No message was found</h1>;
 
@@ -134,7 +134,7 @@ function InboxTable({ headings, search }) {
       <Pagination
         pageNumber={page}
         setPage={setPage}
-        currentDataCount={messages.length}
+        currentDataCount={messages?.length ?? 0}
         totalCount={count}
         paginationStep={PAGINATION_STEP}
       />

@@ -30,6 +30,8 @@ function RoomsTable({ headings, filter }) {
   if (isLoading) return <TableSkeleton headings={headings.map((item) => item.label)} />;
 
   if (isError) return <h1>Error, Please check your network and try again</h1>;
+
+  if (!rooms?.length && !isError) return <h1>No room was found</h1>;
   return (
     <>
       <div className="flex flex-col">
@@ -116,7 +118,7 @@ function RoomsTable({ headings, filter }) {
       <Pagination
         pageNumber={page}
         setPage={setPage}
-        currentDataCount={rooms.length}
+        currentDataCount={rooms?.length == 0}
         totalCount={count}
         paginationStep={PAGINATION_STEP}
       />

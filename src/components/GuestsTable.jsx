@@ -31,7 +31,7 @@ function GuestsTable({ tableHeadings = [], search }) {
 
   if (isError) return <h1>{error.message}</h1>;
 
-  if (!guests) return <h1>No guest was found. Please check your network</h1>;
+  if (!guests?.length && !isError) return <h1>No guest was found.</h1>;
 
   return (
     <>
@@ -126,7 +126,7 @@ function GuestsTable({ tableHeadings = [], search }) {
       <Pagination
         pageNumber={page}
         setPage={setPage}
-        currentDataCount={guests.length}
+        currentDataCount={guests?.length ?? 0}
         totalCount={count}
         paginationStep={PAGINATION_STEP}
       />

@@ -33,7 +33,7 @@ function ReservationsTable({ headings, search }) {
 
   if (isError) return <h1>{error.message}</h1>;
 
-  if (!reservations) return <h1>No reservation was found</h1>;
+  if (!reservations && !isError) return <h1>No reservation was found</h1>;
   return (
     <>
       <div className="flex flex-col">
@@ -137,7 +137,7 @@ function ReservationsTable({ headings, search }) {
       <Pagination
         pageNumber={page}
         setPage={setPage}
-        currentDataCount={reservations.length}
+        currentDataCount={reservations?.length ?? 0}
         totalCount={count}
         paginationStep={PAGINATION_STEP}
       />
