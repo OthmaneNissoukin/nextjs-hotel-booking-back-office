@@ -53,3 +53,4 @@ The project relies on the following environment variables:
 - `VITE_SUPABASE_KEY:` Your Supabase project's public API key.
 - `VITE_SUPABASE_IMGS_URL:` The base URL for the room images stored in Supabase storage.
 - `VITE_SUPABASE_GENERAL_IMGS_URL:` The base URL for general images stored in Supabase storage.
+- `VITE_BACKEND_URL`="http://localhost:3000" // Your backend URL, necessary to access guests data

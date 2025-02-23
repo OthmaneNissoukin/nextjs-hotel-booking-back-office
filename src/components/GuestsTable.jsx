@@ -22,12 +22,18 @@ function GuestsTable({ tableHeadings = [], search }) {
     error,
   } = useQuery({
     queryKey: ["guests", page, search],
-    queryFn: async () => await getAllGuests(page * PAGINATION_STEP, (page + 1) * PAGINATION_STEP, search),
+    queryFn: async () =>
+      await getAllGuests(
+        page * PAGINATION_STEP,
+        (page + 1) * PAGINATION_STEP,
+        search
+      ),
   });
 
   let indexStartingFrom = page * PAGINATION_STEP + 1;
 
-  if (isLoading) return <TableSkeleton headings={tableHeadings.map((item) => item.label)} />;
+  if (isLoading)
+    return <TableSkeleton headings={tableHeadings.map((item) => item.label)} />;
 
   if (isError) return <h1>{error.message}</h1>;
 
@@ -45,32 +51,52 @@ function GuestsTable({ tableHeadings = [], search }) {
 
                   {guests.map((item, index) => (
                     <Table.Row key={index}>
-                      {tableHeadings.find((col) => col.label === "#" && col.show === true) && (
-                        <Table.Cell>{String(indexStartingFrom++).padStart(3, "0")}</Table.Cell>
+                      {tableHeadings.find(
+                        (col) => col.label === "#" && col.show === true
+                      ) ? (
+                        <Table.Cell>
+                          {String(indexStartingFrom++).padStart(3, "0")}
+                        </Table.Cell>
+                      ) : (
+                        <Table.Cell>N/A</Table.Cell>
                       )}
 
-                      {tableHeadings.find((col) => col.label === "Guest" && col.show === true) && (
+                      {tableHeadings.find(
+                        (col) => col.label === "Guest" && col.show === true
+                      ) && (
                         <Table.Cell>
                           <span>{item?.fullname}</span>
                           {item?.nationalID && <br />}
-                          <span className="italic font-extralight text-slate-500">{item?.nationalID}</span>{" "}
+                          <span className="italic font-extralight text-slate-500">
+                            {item?.nationalID}
+                          </span>{" "}
                         </Table.Cell>
                       )}
 
-                      {tableHeadings.find((col) => col.label === "Contacts" && col.show === true) && (
+                      {tableHeadings.find(
+                        (col) => col.label === "Contacts" && col.show === true
+                      ) && (
                         <Table.Cell>
                           <span>{item?.email}</span>
                           {item?.phone && <br />}
-                          <span className="italic font-extralight text-slate-500">{item?.phone}</span>{" "}
+                          <span className="italic font-extralight text-slate-500">
+                            {item?.phone}
+                          </span>{" "}
                         </Table.Cell>
                       )}
 
-                      {tableHeadings.find((col) => col.label === "Nationality" && col.show === true) && (
+                      {tableHeadings.find(
+                        (col) =>
+                          col.label === "Nationality" && col.show === true
+                      ) && (
                         <Table.Cell>
                           {item.nationality ? (
                             <div className="flex items-center gap-3">
                               <span className="w-7 inline-block aspect-video">
-                                <img src={item.countryFlag} className="w-full" />
+                                <img
+                                  src={item.countryFlag}
+                                  className="w-full"
+                                />
                               </span>{" "}
                               <span>{formatCountry(item.nationality)}</span>
                             </div>
@@ -80,9 +106,16 @@ function GuestsTable({ tableHeadings = [], search }) {
                         </Table.Cell>
                       )}
 
-                      {tableHeadings.find((col) => col.label === "Profile" && col.show === true) && (
+                      {tableHeadings.find(
+                        (col) => col.label === "Profile" && col.show === true
+                      ) && (
                         <Table.Cell>
-                          {!(item?.phone && item?.email && item?.nationality && item?.nationalID) ? (
+                          {!(
+                            item?.phone &&
+                            item?.email &&
+                            item?.nationality &&
+                            item?.nationalID
+                          ) ? (
                             <Badge status={"warning"}>Incomplete</Badge>
                           ) : (
                             <Badge status={"success"}>Completed</Badge>
@@ -90,9 +123,14 @@ function GuestsTable({ tableHeadings = [], search }) {
                         </Table.Cell>
                       )}
 
-                      {tableHeadings.find((col) => col.label === "Actions" && col.show === true) && (
+                      {tableHeadings.find(
+                        (col) => col.label === "Actions" && col.show === true
+                      ) && (
                         <Table.Cell>
-                          <DropdownEditMenu align="right" className="relative inline-flex">
+                          <DropdownEditMenu
+                            align="right"
+                            className="relative inline-flex"
+                          >
                             <li>
                               <Link
                                 className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-green-600 hover:text-green-800 focus:outline-none focus:text-green-800 disabled:opacity-50 disabled:pointer-events-none dark:text-green-500 dark:hover:text-green-400 dark:focus:text-green-400"
@@ -108,7 +146,9 @@ function GuestsTable({ tableHeadings = [], search }) {
                               <DeletionModal
                                 queryKey={"guests"}
                                 targetName={item.fullname}
-                                mutationFuntion={async () => deleteGuest(item.id)}
+                                mutationFuntion={async () =>
+                                  deleteGuest(item.id)
+                                }
                                 modalKey={index}
                               />
                             </li>

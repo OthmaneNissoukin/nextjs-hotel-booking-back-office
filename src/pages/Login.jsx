@@ -29,14 +29,25 @@ function Login() {
       },
     });
 
+    if (authData.session?.access_token) {
+      localStorage.setItem("sp_access_tkn", authData.session.access_token);
+    }
+
     if (error) toast.error("Wrong email or password!", { duration: 5000 });
   }
 
   async function authAnounymous() {
     toast.loading("Please wait...");
     const { data, error } = await supabase.auth.signInAnonymously({});
+
+    if (data.session?.access_token) {
+      localStorage.setItem("sp_access_tkn", data.session.access_token);
+    }
+
     toast.dismiss();
-    toast.error("Failed to authenticate!");
+    if (error) {
+      toast.error("Failed to authenticate!");
+    }
 
     return data;
   }
@@ -62,7 +73,10 @@ function Login() {
                   id="email"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="address@mail.com"
-                  {...register("email", { required: true, pattern: "^[w-.]+@([w-]+.)+[w-]{2,4}$" })}
+                  {...register("email", {
+                    required: true,
+                    pattern: "^[w-.]+@([w-]+.)+[w-]{2,4}$",
+                  })}
                 />
                 {errors.email?.type === "required" && (
                   <span className="text-red-800 text-sm italic">the email is required</span>

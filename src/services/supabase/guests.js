@@ -1,32 +1,65 @@
 import supabase from "./db";
 
 export async function getGuestById(id) {
-  let { data: guests, error } = await supabase.from("guests").select("*").eq("id", id).single();
+  const supabaseAccessToken = localStorage.getItem("sp_access_tkn");
 
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
+  if (isNaN(Number(id))) throw new Error("Invalid guest id");
 
-  return guests;
+  try {
+    const req = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/guests?select=*&id=${id}`, {
+      headers: {
+        Authorization: `Bearer ${supabaseAccessToken}`,
+      },
+    });
+
+    const { data: guests, count } = await req.json();
+
+    return guests;
+  } catch (err) {
+    throw new Error(`Failed to retrieve guests: ${err.message}`);
+  }
 }
 export async function getAllGuests(from, to, search) {
-  let query = supabase.from("guests").select("*", { count: "exact" });
+  const supabaseAccessToken = localStorage.getItem("sp_access_tkn");
 
-  if (search) query = query.or(`fullname.ilike.%${search}%,email.ilike.%${search}%,nationalID.ilike.%${search}%`);
-  if (from !== undefined && to !== undefined) query = query.range(from, to);
+  try {
+    let query = `select=*`;
 
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (search)
+      query = query.concat(`&or=fullname.ilike.%${search}%,email.ilike.%${search}%,nationalID.ilike.%${search}%`);
 
-  const { data: guests, error, count } = await query.order("id", { ascending: false });
-  if (error) console.log(error);
+    if (from !== undefined && to !== undefined) query = `&from=${from}&to=${to}`;
 
-  return { guests, count };
+    const req = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/guests?${query}&order=desc`, {
+      headers: {
+        Authorization: `Bearer ${supabaseAccessToken}`,
+      },
+    });
+
+    const { data: guests, count } = await req.json();
+
+    return { guests, count };
+  } catch (err) {
+    throw new Error(`Failed to retrieve guests: ${err.message}`);
+  }
 }
 
 export async function getGuestByEmail(email) {
-  let { data: guests, error } = await supabase.from("guests").select("*").eq("email", email).single();
+  const supabaseAccessToken = localStorage.getItem("sp_access_tkn");
 
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
+  try {
+    const req = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/guests?select=*&email=${email}`, {
+      headers: {
+        Authorization: `Bearer ${supabaseAccessToken}`,
+      },
+    });
 
-  return guests;
+    const { data: guests, count } = await req.json();
+
+    return guests;
+  } catch (err) {
+    throw new Error(`Failed to retrieve guests: ${err.message}`);
+  }
 }
 
 export async function updateGuest(id, guest) {
