@@ -1,18 +1,10 @@
-import supabase from "./db";
+import supabase, { fetchGuests } from "./db";
 
 export async function getGuestById(id) {
-  const supabaseAccessToken = localStorage.getItem("sp_access_tkn");
-
   if (isNaN(Number(id))) throw new Error("Invalid guest id");
 
   try {
-    const req = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/guests?select=*&id=${id}`, {
-      headers: {
-        Authorization: `Bearer ${supabaseAccessToken}`,
-      },
-    });
-
-    const { data: guests, count } = await req.json();
+    const { data: guests, count } = await fetchGuests(`select=*&id=${id}`);
 
     return guests;
   } catch (err) {
@@ -30,13 +22,7 @@ export async function getAllGuests(from, to, search) {
 
     if (from !== undefined && to !== undefined) query = `&from=${from}&to=${to}`;
 
-    const req = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/guests?${query}&order=desc`, {
-      headers: {
-        Authorization: `Bearer ${supabaseAccessToken}`,
-      },
-    });
-
-    const { data: guests, count } = await req.json();
+    const { data: guests, count } = await fetchGuests(`${query}&order=desc`);
 
     return { guests, count };
   } catch (err) {
@@ -48,13 +34,7 @@ export async function getGuestByEmail(email) {
   const supabaseAccessToken = localStorage.getItem("sp_access_tkn");
 
   try {
-    const req = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/guests?select=*&email=${email}`, {
-      headers: {
-        Authorization: `Bearer ${supabaseAccessToken}`,
-      },
-    });
-
-    const { data: guests, count } = await req.json();
+    const { data: guests, count } = await fetchGuests(`guests?select=*&email=${email}`);
 
     return guests;
   } catch (err) {
